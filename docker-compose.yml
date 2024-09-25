@@ -1,0 +1,41 @@
+version: '3'
+services:
+
+  #mysql database
+  mysql-db:
+    image: mysql:5.7
+    container_name: mysql-db
+    ports:
+      - "3306:3306"
+    environment:
+        MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+        MYSQL_DATABASE: ${DB_NAME}
+        MYSQL_USER: ${DB_USER}
+        MYSQL_PASSWORD: ${DB_PASSWORD}
+    healthcheck:
+        test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD}"]
+        interval: 10s
+        retries: 5
+        timeout: 5s
+
+  #backend service
+  backend:
+    build:
+      context: backend
+    depends_on:
+      mysql-db:
+            condition: service_healthy
+    container_name: fake_backend
+    ports:
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
+    volumes:
+      - ./backend:/usr/src/app
+    environment:
+    - BACKEND_PORT=${BACKEND_PORT}
+    - DB_USER=${DB_USER}
+    - DB_NAME=${DB_NAME}
+    - DB_PASSWORD=${DB_PASSWORD}
+    - DB_HOST=${DB_HOST}
+
+
+
