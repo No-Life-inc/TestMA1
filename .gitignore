@@ -14,6 +14,8 @@
 cmake-build-*/
 backend/node_modules
 
+node_modules/
+
 # Mongo Explorer plugin
 .idea/**/mongoSettings.xml
 
