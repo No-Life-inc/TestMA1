@@ -106,4 +106,21 @@ const getRandomPerson = () => {
   };
 };
 
-export { getRandomCPR, getBirthDateFromCPR, getRandomPerson };
+const getRandomPersonWithBirthdate = () => {
+  const randomPerson = getRandomPerson();
+
+  const genderAsBoolean = randomPerson.gender === "male";
+
+  const randomCPR = getRandomCPR(genderAsBoolean); //Laver et random cpr ud fra kønnet
+
+  const birthDate = getBirthDateFromCPR(randomCPR); //Laver en birthdate ud fra cpr
+
+  return {
+    firstName: randomPerson.firstName,
+    lastName: randomPerson.lastName,
+    gender: randomPerson.gender,
+    birthDate: birthDate.toISOString().split("T")[0], //ISO format, så det hedder yyyy-mm-dd
+  };
+};
+
+export { getRandomCPR, getBirthDateFromCPR, getRandomPerson, getRandomPersonWithBirthdate };

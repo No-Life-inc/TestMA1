@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-import { getRandomPerson } from "./src/fakeInfoFunctions.js";
+import { getRandomPerson,getRandomPersonWithBirthdate } from "./src/fakeInfoFunctions.js";
 
 dotenv.config();
 const app = express();
@@ -11,6 +11,11 @@ app.get("/", (req, res) => {
 
 app.get("/random-person", (req, res) => {
   const person = getRandomPerson();
+  res.json(person);
+});
+
+app.get("/random-person-with-birthdate", (req, res) => {
+  const person = getRandomPersonWithBirthdate();
   res.json(person);
 });
 
