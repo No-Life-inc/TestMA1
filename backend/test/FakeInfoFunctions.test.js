@@ -100,22 +100,31 @@ describe("getPersonsDataNegativeTests", () => {
   });
 });
 
-describe("getRandomPersonPositiveTests", () => {
+// Boundary Analysis: Handle case with exactly one person
+describe("getPersonsDataBoundaryTests", () => {
+  test("should return data for exactly one person in file", () => {
+    const mockData = {
+      persons: [{ firstName: "John", lastName: "Doe", gender: "male" }],
+    };
+    jest.spyOn(fs, "readFileSync").mockReturnValue(JSON.stringify(mockData));
+    const data = getPersonsData();
+    expect(data.persons).toHaveLength(1); // Boundary: Exactly one person
+    fs.readFileSync.mockRestore();
+  });
+});
+
+// Boundary Analysis: Test with file containing only one male or one female
+describe("getRandomPersonBoundaryTests", () => {
   test.each([["male"], ["female"]])(
-    "should return a person with gender %s",
+    "should return the only person available in file with gender %s",
     (gender) => {
       const mockData = {
-        persons: [
-          { firstName: "John", lastName: "Doe", gender: "male" },
-          { firstName: "Jane", lastName: "Doe", gender: "female" },
-        ],
+        persons: [{ firstName: "Unique", lastName: "Person", gender }],
       };
       jest.spyOn(fs, "readFileSync").mockReturnValue(JSON.stringify(mockData));
       const person = getRandomPerson();
-      expect(person).toHaveProperty("firstName");
-      expect(person).toHaveProperty("lastName");
-      expect(person).toHaveProperty("gender");
-      expect(["male", "female"]).toContain(person.gender);
+      expect(person.firstName).toBe("Unique"); // Boundary: Only one person in the file
+      expect(person.gender).toBe(gender);
       fs.readFileSync.mockRestore();
     }
   );
