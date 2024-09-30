@@ -58,30 +58,34 @@ const getBirthDateFromCPR = (cpr) => {
   return new Date(fullYear, month - 1, day);
 };
 
-const getPersonsData = () => {
-  try {
-    const filePath = path.resolve("data", "person-names.json");
-    const data = fs.readFileSync(filePath, "utf-8");
-
-    const parsedData = JSON.parse(data);
-
-    if (
-      !parsedData ||
-      !Array.isArray(parsedData.persons) ||
-      parsedData.persons.length === 0
-    ) {
-      throw new Error("No persons found in the data file");
-    }
-
-    return parsedData;
-  } catch (error) {
-    console.error(
-      "Error reading or parsing person-names.json: ",
-      error.message
-    );
-    return null;
-  }
+//Hjælper funktion til konvertering af Date objektet til en string
+const formatDate = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // `getMonth()` er 0-baseret
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 };
+
+const getPersonsData = () => {
+    try {
+      const filePath = path.resolve("data", "person-names.json");
+      const data = fs.readFileSync(filePath, "utf-8");
+  
+      const parsedData = JSON.parse(data);
+  
+      if (
+        !parsedData ||
+        !Array.isArray(parsedData.persons) ||
+        parsedData.persons.length === 0
+      ) {
+        throw new Error("No persons found in the data file");
+      }
+  
+      return parsedData;
+    } catch (error) {
+      throw new Error("Error reading or parsing person-names.json");
+    }
+  };
 
 const getRandomPerson = () => {
   const personsData = getPersonsData();
@@ -119,7 +123,7 @@ const getRandomPersonWithBirthdate = () => {
     firstName: randomPerson.firstName,
     lastName: randomPerson.lastName,
     gender: randomPerson.gender,
-    birthDate: birthDate.toISOString().split("T")[0], //ISO format, så det hedder yyyy-mm-dd
+    birthDate: formatDate(birthDate),
   };
 };
 
@@ -151,7 +155,7 @@ const getRandomPersonWithCPRandBirthdate = () => {
     lastName: randomPerson.lastName,
     gender: randomPerson.gender,
     cpr: randomCPR,
-    birthDate: birthdate.toISOString().split("T")[0],
+    birthDate: formatDate(birthdate),
   };
 };
 
@@ -162,4 +166,5 @@ export {
   getRandomPersonWithBirthdate,
   getRandomPersonWithCPR,
   getRandomPersonWithCPRandBirthdate,
+  getPersonsData,
 };
