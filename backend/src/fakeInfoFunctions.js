@@ -123,4 +123,24 @@ const getRandomPersonWithBirthdate = () => {
   };
 };
 
-export { getRandomCPR, getBirthDateFromCPR, getRandomPerson, getRandomPersonWithBirthdate };
+const getRandomPersonWithCPR = () => {
+  const randomPerson = getRandomPerson();
+
+  const genderAsBoolean = randomPerson.gender === "male";
+  const randomCPR = getRandomCPR(genderAsBoolean);
+
+  return {
+    firstName: randomPerson.firstName,
+    lastName: randomPerson.lastName,
+    gender: randomPerson.gender,
+    cpr: randomCPR,
+  };
+};
+
+export {
+  getRandomCPR,
+  getBirthDateFromCPR,
+  getRandomPerson,
+  getRandomPersonWithBirthdate,
+  getRandomPersonWithCPR,
+};
