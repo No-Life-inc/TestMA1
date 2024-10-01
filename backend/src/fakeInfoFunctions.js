@@ -141,21 +141,23 @@ const getRandomPersonWithCPR = () => {
   };
 };
 
-const getRandomPersonWithCPRandBirthdate = () => {
-  const randomPerson = getRandomPerson();
+const getRandomPersonWithCPRandBirthdate = (
+  randomPersonGenerator = getRandomPerson, 
+  randomCPRGenerator = getRandomCPR
+) => {
+  // Brug de overførte generatorer eller standard funktionerne
+  const randomPerson = randomPersonGenerator();
 
   const genderAsBoolean = randomPerson.gender === "male";
-
-  const randomCPR = getRandomCPR(genderAsBoolean);
-
-  const birthdate = getBirthDateFromCPR(randomCPR);
+  const randomCPR = randomCPRGenerator(genderAsBoolean);
+  const birthDate = getBirthDateFromCPR(randomCPR);
 
   return {
     firstName: randomPerson.firstName,
     lastName: randomPerson.lastName,
     gender: randomPerson.gender,
     cpr: randomCPR,
-    birthDate: formatDate(birthdate),
+    birthDate: formatDate(birthDate),
   };
 };
 
