@@ -1,5 +1,14 @@
 import fs from "fs";
 import path from "path";
+import db from "../db/db.js";
+import {
+  formatDate,
+  getRandomStreet,
+  getRandomNumber,
+  getRandomFloor,
+  getRandomDoor,
+} from "./helperFunctions.js";
+import { phonePrefixes } from "../data/phoneData.js";
 
 // make a CPR number function
 const getRandomCPR = (gender) => {
@@ -58,35 +67,29 @@ const getBirthDateFromCPR = (cpr) => {
   return new Date(fullYear, month - 1, day);
 };
 
-//Hjælper funktion til konvertering af Date objektet til en string
-const formatDate = (date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0"); // `getMonth()` er 0-baseret
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+//Bruges til at indlæse json filen
+const getPersonsData = () => {
+  try {
+    const filePath = path.resolve("data", "person-names.json");
+    const data = fs.readFileSync(filePath, "utf-8");
+
+    const parsedData = JSON.parse(data);
+
+    if (
+      !parsedData ||
+      !Array.isArray(parsedData.persons) ||
+      parsedData.persons.length === 0
+    ) {
+      throw new Error("No persons found in the data file");
+    }
+
+    return parsedData;
+  } catch (error) {
+    throw new Error("Error reading or parsing person-names.json");
+  }
 };
 
-const getPersonsData = () => {
-    try {
-      const filePath = path.resolve("data", "person-names.json");
-      const data = fs.readFileSync(filePath, "utf-8");
-  
-      const parsedData = JSON.parse(data);
-  
-      if (
-        !parsedData ||
-        !Array.isArray(parsedData.persons) ||
-        parsedData.persons.length === 0
-      ) {
-        throw new Error("No persons found in the data file");
-      }
-  
-      return parsedData;
-    } catch (error) {
-      throw new Error("Error reading or parsing person-names.json");
-    }
-  };
-
+// Funktion der henter en tilfældig person fra json filen
 const getRandomPerson = () => {
   const personsData = getPersonsData();
 
@@ -110,6 +113,7 @@ const getRandomPerson = () => {
   };
 };
 
+// Funktion der henter en tilfældig person fra json filen og tilføjer en birthdate
 const getRandomPersonWithBirthdate = () => {
   const randomPerson = getRandomPerson();
 
@@ -127,6 +131,7 @@ const getRandomPersonWithBirthdate = () => {
   };
 };
 
+// Funktion der henter en tilfældig person fra json filen og tilføjer en cpr
 const getRandomPersonWithCPR = () => {
   const randomPerson = getRandomPerson();
 
@@ -141,11 +146,11 @@ const getRandomPersonWithCPR = () => {
   };
 };
 
+// Funktion der henter en tilfældig person fra json filen og tilføjer en cpr og birthdate
 const getRandomPersonWithCPRandBirthdate = (
-  randomPersonGenerator = getRandomPerson, 
+  randomPersonGenerator = getRandomPerson,
   randomCPRGenerator = getRandomCPR
 ) => {
-  // Brug de overførte generatorer eller standard funktionerne
   const randomPerson = randomPersonGenerator();
 
   const genderAsBoolean = randomPerson.gender === "male";
@@ -161,6 +166,40 @@ const getRandomPersonWithCPRandBirthdate = (
   };
 };
 
+// Funktion til at hente en tilfældig adresse fra databasen
+const getRandomAddress = async () => {
+  try {
+    const address = await db("address").orderByRaw("RAND()").first();
+    const street = getRandomStreet();
+    const number = getRandomNumber();
+    const floor = getRandomFloor();
+    const door = getRandomDoor();
+
+    return {
+      street,
+      number,
+      floor,
+      door,
+      postal_code: address.postal_code,
+      town_name: address.town_name,
+    };
+  } catch (error) {
+    console.error("Error fetching random address:", error.message);
+    throw new Error("Failed to fetch random address");
+  }
+};
+
+const getRandomPhoneNumber = () => {
+  const prefix = phonePrefixes[Math.floor(Math.random() * phonePrefixes.length)];
+  let phoneNumber = prefix;
+  const remainingDigits = 8 - prefix.length;
+
+  for (let i = 0; i < remainingDigits; i++) {
+    phoneNumber += Math.floor(Math.random() * 10).toString();
+  }
+  return phoneNumber;
+};
+
 export {
   getRandomCPR,
   getBirthDateFromCPR,
@@ -169,4 +208,6 @@ export {
   getRandomPersonWithCPR,
   getRandomPersonWithCPRandBirthdate,
   getPersonsData,
+  getRandomAddress,
+  getRandomPhoneNumber,
 };

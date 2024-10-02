@@ -5,11 +5,13 @@ import {
   getRandomPersonWithBirthdate,
   getRandomPersonWithCPR,
   getRandomPersonWithCPRandBirthdate,
+  getRandomAddress,
+  getRandomPhoneNumber,
 } from "../src/fakeInfoFunctions.js";
 
 const router = express.Router();
 
-router.get("/random-cpr", (req, res) => {
+router.get("/cpr", (req, res) => {
   try {
     const genderAsBoolean = Math.random() < 0.5;
     const randomCPR = getRandomCPR(genderAsBoolean);
@@ -20,7 +22,7 @@ router.get("/random-cpr", (req, res) => {
   }
 });
 
-router.get("/random-person", (req, res) => {
+router.get("/person", (req, res) => {
   try {
     const person = getRandomPerson();
     res.json(person);
@@ -30,7 +32,7 @@ router.get("/random-person", (req, res) => {
   }
 });
 
-router.get("/random-person-with-birthdate", (req, res) => {
+router.get("/person-dob", (req, res) => {
   try {
     const person = getRandomPersonWithBirthdate();
     res.json(person);
@@ -42,7 +44,7 @@ router.get("/random-person-with-birthdate", (req, res) => {
   }
 });
 
-router.get("/random-person-with-cpr", (req, res) => {
+router.get("/person-cpr", (req, res) => {
   try {
     const person = getRandomPersonWithCPR();
     res.json(person);
@@ -54,19 +56,36 @@ router.get("/random-person-with-cpr", (req, res) => {
   }
 });
 
-router.get("/random-person-with-cpr-and-birthdate", (req, res) => {
+router.get("/person-cpr-dob", (req, res) => {
   try {
     const person = getRandomPersonWithCPRandBirthdate();
     res.json(person);
   } catch (error) {
     console.error(error.message);
-    res
-      .status(500)
-      .json({
-        error: "Failed to generate random person with CPR and birthdate",
-      });
+    res.status(500).json({
+      error: "Failed to generate random person with CPR and birthdate",
+    });
   }
 });
 
+router.get("/address", async (req, res) => {
+  try {
+    const address = await getRandomAddress();
+    res.json(address);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: "Failed to generate random address" });
+  }
+});
+
+router.get("/phone", (req, res) => {
+  try {
+    const phoneNumber = getRandomPhoneNumber();
+    res.json({phoneNumber});
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: "Failed to generate random phone number" });
+  }
+});
 
 export default router;
