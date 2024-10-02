@@ -190,7 +190,8 @@ const getRandomAddress = async () => {
 };
 
 const getRandomPhoneNumber = () => {
-  const prefix = phonePrefixes[Math.floor(Math.random() * phonePrefixes.length)];
+  const prefix =
+    phonePrefixes[Math.floor(Math.random() * phonePrefixes.length)];
   let phoneNumber = prefix;
   const remainingDigits = 8 - prefix.length;
 
@@ -198,6 +199,22 @@ const getRandomPhoneNumber = () => {
     phoneNumber += Math.floor(Math.random() * 10).toString();
   }
   return phoneNumber;
+};
+
+const getRandomPersonFullInfo = async () => {
+  const personInfo = getRandomPersonWithCPRandBirthdate();
+  const address = await getRandomAddress();
+  const phoneNumber = getRandomPhoneNumber();
+
+  return {
+    firstName: personInfo.firstName,
+    lastName: personInfo.lastName,
+    gender: personInfo.gender,
+    birthDate: personInfo.birthDate,
+    cpr: personInfo.cpr,
+    address,
+    phoneNumber,
+  };
 };
 
 export {
@@ -210,4 +227,5 @@ export {
   getPersonsData,
   getRandomAddress,
   getRandomPhoneNumber,
+  getRandomPersonFullInfo,
 };

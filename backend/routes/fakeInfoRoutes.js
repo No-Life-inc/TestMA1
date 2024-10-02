@@ -7,6 +7,7 @@ import {
   getRandomPersonWithCPRandBirthdate,
   getRandomAddress,
   getRandomPhoneNumber,
+  getRandomPersonFullInfo
 } from "../src/fakeInfoFunctions.js";
 
 const router = express.Router();
@@ -81,10 +82,22 @@ router.get("/address", async (req, res) => {
 router.get("/phone", (req, res) => {
   try {
     const phoneNumber = getRandomPhoneNumber();
-    res.json({phoneNumber});
+    res.json({ phoneNumber });
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ error: "Failed to generate random phone number" });
+  }
+});
+
+router.get("/person-full", async (req, res) => {
+  try {
+    const fullPersonInfo = await getRandomPersonFullInfo();
+    res.json(fullPersonInfo);
+  } catch (error) {
+    console.error(error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to generate random person with full info" });
   }
 });
 
