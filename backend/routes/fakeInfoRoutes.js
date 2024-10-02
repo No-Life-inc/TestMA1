@@ -7,7 +7,8 @@ import {
   getRandomPersonWithCPRandBirthdate,
   getRandomAddress,
   getRandomPhoneNumber,
-  getRandomPersonFullInfo
+  getRandomPersonFullInfo,
+  getRandomPersonsBulk,
 } from "../src/fakeInfoFunctions.js";
 
 const router = express.Router();
@@ -98,6 +99,17 @@ router.get("/person-full", async (req, res) => {
     res
       .status(500)
       .json({ error: "Failed to generate random person with full info" });
+  }
+});
+
+router.get("/bulk/:count", async (req, res) => {
+  try {
+    const count = parseInt(req.params.count, 10);
+    const persons = await getRandomPersonsBulk(count);
+    res.json(persons);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: "Failed to generate bulk" });
   }
 });
 

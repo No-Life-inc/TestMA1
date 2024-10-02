@@ -217,6 +217,18 @@ const getRandomPersonFullInfo = async () => {
   };
 };
 
+const getRandomPersonsBulk = async (count) => {
+  if (count < 2) count = 2;
+  if (count > 100) count = 100;
+
+  const persons = [];
+  for (let i = 0; i < count; i++) {
+    const fullPersonInfo = await getRandomPersonFullInfo();
+    persons.push(fullPersonInfo);
+  }
+  return persons;
+};
+
 export {
   getRandomCPR,
   getBirthDateFromCPR,
@@ -228,4 +240,5 @@ export {
   getRandomAddress,
   getRandomPhoneNumber,
   getRandomPersonFullInfo,
+  getRandomPersonsBulk,
 };
