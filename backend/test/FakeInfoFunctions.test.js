@@ -1,15 +1,16 @@
 import fs from "fs";
 import jest from "jest-mock";
 import {
-    getRandomCPR,
-    getBirthDateFromCPR,
-    getRandomPerson,
-    getRandomPersonWithBirthdate,
-    getRandomPersonWithCPR,
-    getRandomPersonWithCPRandBirthdate,
-    getPersonsData, getRandomPhoneNumber,
+  getRandomCPR,
+  getBirthDateFromCPR,
+  getRandomPerson,
+  getRandomPersonWithBirthdate,
+  getRandomPersonWithCPR,
+  getRandomPersonWithCPRandBirthdate,
+  getPersonsData,
+  getRandomPhoneNumber,
 } from "../src/fakeInfoFunctions";
-import {phonePrefixes} from "../data/phoneData.js";
+import { phonePrefixes } from "../data/phoneData.js";
 
 describe("getRandomCPRPositiveTests", () => {
   test.each([
@@ -132,31 +133,30 @@ describe("getRandomPersonBoundaryTests", () => {
 });
 
 describe("getRandomPersonNegativeTests", () => {
-    test("Returns the first person when random index is 0", () => {
-        const mockGetPersonsData = jest.spyOn(global, 'getPersonsData').mockReturnValue({
-            persons: [
-                { firstName: "John", lastName: "Doe", gender: "male" },
-                { firstName: "Jane", lastName: "Doe", gender: "female" }
-            ]
-        });
+  test("Returns the first person when random index is 0", () => {
+    const mockGetPersonsData = jest
+      .spyOn(global, "getPersonsData")
+      .mockReturnValue({
+        persons: [
+          { firstName: "John", lastName: "Doe", gender: "male" },
+          { firstName: "Jane", lastName: "Doe", gender: "female" },
+        ],
+      });
 
-        jest.spyOn(Math, 'random').mockReturnValue(0);  // Mock til at returnere første person
+    jest.spyOn(Math, "random").mockReturnValue(0); // Mock til at returnere første person
 
-        const person = getRandomPerson();
+    const person = getRandomPerson();
 
-        expect(person).toEqual({
-            firstName: "John",
-            lastName: "Doe",
-            gender: "male"
-        });
-
-        mockGetPersonsData.mockRestore();
-        Math.random.mockRestore();
+    expect(person).toEqual({
+      firstName: "John",
+      lastName: "Doe",
+      gender: "male",
     });
+
+    mockGetPersonsData.mockRestore();
+    Math.random.mockRestore();
+  });
 });
-
-
-
 
 // //TODO - alle test herfra og ned skal muligvis ændres, så de følger boundary analysis og equivalence partitioning bedre
 // describe("getRandomPersonPositiveTests", () => {
@@ -262,51 +262,65 @@ describe("getRandomPersonNegativeTests", () => {
 //   );
 // });
 
-//Positive test for randomPhoneNumber
-describe("getRandomPhoneNumber", ()=>{
-    it("should return a valid phone number with a 8 digits", ()=>{
-        const phoneNumber = getRandomPhoneNumber();
-        expect(phoneNumber).toMatch(/^\d{8}$/);
-    });
-
-    it("should return a phone number that starts with a valid prefix", ()=>{
-        const phoneNumber = getRandomPhoneNumber();
-        const matchingPrefix = phonePrefixes.find(prefix => phoneNumber.startsWith(prefix));
-    });
-})
+//Positive tests for getRandomPhoneNumber
+describe("getRandomPhoneNumber", () => {
+  test.each([
+    [
+      "should return a valid phone number with 8 digits",
+      (phone) => expect(phone).toMatch(/^\d{8}$/),
+    ],
+    [
+      "should return a phone number that starts with a valid prefix",
+      (phone) => {
+        const matchingPrefix = phonePrefixes.find((prefix) =>
+          phone.startsWith(prefix)
+        );
+        expect(matchingPrefix).toBeDefined();
+      },
+    ],
+  ])("%s", (testDescription, assertion) => {
+    const phoneNumber = getRandomPhoneNumber();
+    assertion(phoneNumber);
+  });
+});
 
 //Negative tests for randomPhoneNumber
 describe("getRandomPhoneNumber - Negative Tests", () => {
-
-    it("should not return a phone number shorter than 8 digits", () => {
-        const phoneNumber = getRandomPhoneNumber();
-        expect(phoneNumber.length).toBeGreaterThanOrEqual(8);
-    });
-
-    it("should not return a phone number longer than 8 digits", () => {
-        const phoneNumber = getRandomPhoneNumber();
-        expect(phoneNumber.length).toBeLessThanOrEqual(8);
-    });
-
-    it("should not contain any non-numeric characters", () => {
-        const phoneNumber = getRandomPhoneNumber();
-        expect(phoneNumber).toMatch(/^\d+$/); // Matcher kun numeriske karakterer
-    });
-
-    it("should always start with a valid prefix", () => {
-        const phoneNumber = getRandomPhoneNumber();
-        const matchingPrefix = phonePrefixes.find(prefix => phoneNumber.startsWith(prefix));
-        expect(matchingPrefix).toBeDefined(); // Forventer at der findes et validt prefix
-    });
-
-    it("should not return a phone number with an invalid prefix length", () => {
-        const phoneNumber = getRandomPhoneNumber();
-        const prefixLength = phonePrefixes.find(prefix => phoneNumber.startsWith(prefix))?.length;
+  // Table-driven tests for phone number length, character checks, and prefix validation
+  test.each([
+    [
+      "should not return a phone number shorter than 8 digits",
+      (phone) => expect(phone.length).toBeGreaterThanOrEqual(8),
+    ],
+    [
+      "should not return a phone number longer than 8 digits",
+      (phone) => expect(phone.length).toBeLessThanOrEqual(8),
+    ],
+    [
+      "should not contain any non-numeric characters",
+      (phone) => expect(phone).toMatch(/^\d+$/),
+    ],
+    [
+      "should always start with a valid prefix",
+      (phone) => {
+        const matchingPrefix = phonePrefixes.find((prefix) =>
+          phone.startsWith(prefix)
+        );
+        expect(matchingPrefix).toBeDefined();
+      },
+    ],
+    [
+      "should not return a phone number with an invalid prefix length",
+      (phone) => {
+        const prefixLength = phonePrefixes.find((prefix) =>
+          phone.startsWith(prefix)
+        )?.length;
         const remainingDigits = 8 - (prefixLength || 0);
-
-        expect(remainingDigits).toBeGreaterThanOrEqual(0); // Prefix må ikke være for langt
-    });
-
+        expect(remainingDigits).toBeGreaterThanOrEqual(0);
+      },
+    ],
+  ])("%s", (testDescription, assertion) => {
+    const phoneNumber = getRandomPhoneNumber();
+    assertion(phoneNumber);
+  });
 });
-
-
