@@ -262,9 +262,10 @@ describe("getRandomPersonNegativeTests", () => {
 //   );
 // });
 
+//Positive test for randomPhoneNumber
 describe("getRandomPhoneNumber", ()=>{
     it("should return a valid phone number with a 8 digits", ()=>{
-        const phoneNumber = getRandomPhoneNumber()();
+        const phoneNumber = getRandomPhoneNumber();
         expect(phoneNumber).toMatch(/^\d{8}$/);
     });
 
@@ -273,3 +274,39 @@ describe("getRandomPhoneNumber", ()=>{
         const matchingPrefix = phonePrefixes.find(prefix => phoneNumber.startsWith(prefix));
     });
 })
+
+//Negative tests for randomPhoneNumber
+describe("getRandomPhoneNumber - Negative Tests", () => {
+
+    it("should not return a phone number shorter than 8 digits", () => {
+        const phoneNumber = getRandomPhoneNumber();
+        expect(phoneNumber.length).toBeGreaterThanOrEqual(8);
+    });
+
+    it("should not return a phone number longer than 8 digits", () => {
+        const phoneNumber = getRandomPhoneNumber();
+        expect(phoneNumber.length).toBeLessThanOrEqual(8);
+    });
+
+    it("should not contain any non-numeric characters", () => {
+        const phoneNumber = getRandomPhoneNumber();
+        expect(phoneNumber).toMatch(/^\d+$/); // Matcher kun numeriske karakterer
+    });
+
+    it("should always start with a valid prefix", () => {
+        const phoneNumber = getRandomPhoneNumber();
+        const matchingPrefix = phonePrefixes.find(prefix => phoneNumber.startsWith(prefix));
+        expect(matchingPrefix).toBeDefined(); // Forventer at der findes et validt prefix
+    });
+
+    it("should not return a phone number with an invalid prefix length", () => {
+        const phoneNumber = getRandomPhoneNumber();
+        const prefixLength = phonePrefixes.find(prefix => phoneNumber.startsWith(prefix))?.length;
+        const remainingDigits = 8 - (prefixLength || 0);
+
+        expect(remainingDigits).toBeGreaterThanOrEqual(0); // Prefix må ikke være for langt
+    });
+
+});
+
+
