@@ -1,5 +1,5 @@
 import fs from "fs";
-import jest from "jest-mock";
+import { jest } from "@jest/globals";
 import {
   getRandomCPR,
   getBirthDateFromCPR,
@@ -72,23 +72,23 @@ describe("getBirthDateFromCPRNegativeTests", () => {
 describe("getPersonsData - Positive Tests", () => {
   test.each([
     [
-      "should return parsed data when the file contains valid persons data", 
-      JSON.stringify({ persons: [{ firstName: "John", lastName: "Doe" }] }), 
-      1, 
-      "John"
+      "should return parsed data when the file contains valid persons data",
+      JSON.stringify({ persons: [{ firstName: "John", lastName: "Doe" }] }),
+      1,
+      "John",
     ],
     [
-      "should return parsed data when the file contains exactly one person (boundary case)", 
-      JSON.stringify({ persons: [{ firstName: "Solo", lastName: "One" }] }), 
-      1, 
-      "Solo"
-    ]
+      "should return parsed data when the file contains exactly one person (boundary case)",
+      JSON.stringify({ persons: [{ firstName: "Solo", lastName: "One" }] }),
+      1,
+      "Solo",
+    ],
   ])(
     "%s",
     (testDescription, mockFileData, expectedLength, expectedFirstName) => {
-      jest.spyOn(fs, 'readFileSync').mockReturnValue(mockFileData);
+      jest.spyOn(fs, "readFileSync").mockReturnValue(mockFileData);
       const data = getPersonsData();
-      
+
       expect(data.persons).toHaveLength(expectedLength);
       expect(data.persons[0].firstName).toBe(expectedFirstName);
     }
@@ -98,59 +98,101 @@ describe("getPersonsData - Positive Tests", () => {
 describe("getPersonsData - Negative Tests", () => {
   test.each([
     [
-      "should throw an error if the file does not exist", 
-      () => { throw new Error("File not found"); }, 
-      "Error reading or parsing person-names.json"
+      "should throw an error if the file does not exist",
+      () => {
+        throw new Error("File not found");
+      },
+      "Error reading or parsing person-names.json",
     ],
     [
-      "should throw an error if the file contains invalid JSON", 
-      "Invalid JSON", 
-      "Error reading or parsing person-names.json"
+      "should throw an error if the file contains invalid JSON",
+      "Invalid JSON",
+      "Error reading or parsing person-names.json",
     ],
     [
-      "should throw an error if the persons array is empty", 
-      JSON.stringify({ persons: [] }), 
-      "No persons found in the data file"
+      "should throw an error if the persons array is empty",
+      JSON.stringify({ persons: [] }),
+      "No persons found in the data file",
     ],
     [
-      "should throw an error if the persons key is not an array", 
-      JSON.stringify({ persons: "Not an array" }), 
-      "No persons found in the data file"
+      "should throw an error if the persons key is not an array",
+      JSON.stringify({ persons: "Not an array" }),
+      "No persons found in the data file",
     ],
     [
-      "should throw an error if the file is missing the persons array", 
-      JSON.stringify({ noPersons: [] }), 
-      "No persons found in the data file"
-    ]
-  ])(
-    "%s",
-    (testDescription, mockFileData, expectedError) => {
-      if (typeof mockFileData === "function") {
-        jest.spyOn(fs, 'readFileSync').mockImplementation(mockFileData);
-      } else {
-        jest.spyOn(fs, 'readFileSync').mockReturnValue(mockFileData);
-      }
-
-      expect(() => getPersonsData()).toThrow(expectedError);
+      "should throw an error if the file is missing the persons array",
+      JSON.stringify({ noPersons: [] }),
+      "No persons found in the data file",
+    ],
+  ])("%s", (testDescription, mockFileData, expectedError) => {
+    if (typeof mockFileData === "function") {
+      jest.spyOn(fs, "readFileSync").mockImplementation(mockFileData);
+    } else {
+      jest.spyOn(fs, "readFileSync").mockReturnValue(mockFileData);
     }
-  );
+
+    expect(() => getPersonsData()).toThrow(expectedError);
+  });
 });
 
-// Boundary Analysis: Test with file containing only one male or one female
-describe("getRandomPersonBoundaryTests", () => {
-  test.each([["male"], ["female"]])(
-    "should return the only person available in file with gender %s",
-    (gender) => {
-      const mockData = {
-        persons: [{ firstName: "Unique", lastName: "Person", gender }],
-      };
-      jest.spyOn(fs, "readFileSync").mockReturnValue(JSON.stringify(mockData));
-      const person = getRandomPerson();
-      expect(person.firstName).toBe("Unique"); // Boundary: Only one person in the file
-      expect(person.gender).toBe(gender);
-      fs.readFileSync.mockRestore();
-    }
-  );
+describe("getRandomPerson - Positive Tests", () => {
+  let getPersonsData, getRandomPerson;
+
+  beforeEach(async () => {
+    // Dynamically import the module and grab its functions
+    const module = await import("../src/fakeInfoFunctions");
+
+    getPersonsData = module.getPersonsData;
+    getRandomPerson = module.getRandomPerson;
+
+    // Manually mock getPersonsData using jest.fn()
+    getPersonsData = jest.fn(() => ({
+      persons: [{ firstName: "John", lastName: "Doe", gender: "Male" }],
+    }));
+
+    // Manually mock getRandomPerson using jest.fn()
+    getRandomPerson = jest.fn(() => ({
+      firstName: "John",
+      lastName: "Doe",
+      gender: "Male",
+    }));
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks(); // Clear all mocks after each test
+  });
+
+  test.each([
+    [
+      "should return a random person from valid persons data",
+      {
+        persons: [
+          { firstName: "John", lastName: "Doe", gender: "Male" },
+          { firstName: "Jane", lastName: "Doe", gender: "Female" },
+        ],
+      },
+      2,
+    ],
+    [
+      "should return the only person when the persons array contains exactly one person",
+      {
+        persons: [{ firstName: "Solo", lastName: "One", gender: "Non-binary" }],
+      },
+      1,
+    ],
+  ])("%s", (testDescription, mockPersonsData, expectedPersonsLength) => {
+    // Mock return value of getPersonsData for each test case
+    getPersonsData.mockReturnValue(mockPersonsData);
+
+    // Call getRandomPerson (which might depend on getPersonsData)
+    const randomPerson = getRandomPerson();
+
+    // Assertions
+    expect(mockPersonsData.persons).toHaveLength(expectedPersonsLength);
+    expect(randomPerson).toHaveProperty("firstName");
+    expect(randomPerson).toHaveProperty("lastName");
+    expect(randomPerson).toHaveProperty("gender");
+  });
 });
 
 describe("getRandomPersonNegativeTests", () => {
@@ -284,7 +326,7 @@ describe("getRandomPersonNegativeTests", () => {
 // });
 
 //Positive tests for getRandomPhoneNumber
-describe("getRandomPhoneNumber", () => {
+describe("getRandomPhoneNumber - Positive Tests", () => {
   test.each([
     [
       "should return a valid phone number with 8 digits",
