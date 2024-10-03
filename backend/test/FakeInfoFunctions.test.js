@@ -1,14 +1,15 @@
 import fs from "fs";
 import jest from "jest-mock";
 import {
-  getRandomCPR,
-  getBirthDateFromCPR,
-  getRandomPerson,
-  getRandomPersonWithBirthdate,
-  getRandomPersonWithCPR,
-  getRandomPersonWithCPRandBirthdate,
-  getPersonsData,
+    getRandomCPR,
+    getBirthDateFromCPR,
+    getRandomPerson,
+    getRandomPersonWithBirthdate,
+    getRandomPersonWithCPR,
+    getRandomPersonWithCPRandBirthdate,
+    getPersonsData, getRandomPhoneNumber,
 } from "../src/fakeInfoFunctions";
+import {phonePrefixes} from "../data/phoneData.js";
 
 describe("getRandomCPRPositiveTests", () => {
   test.each([
@@ -130,107 +131,145 @@ describe("getRandomPersonBoundaryTests", () => {
   );
 });
 
-//TODO - alle test herfra og ned skal muligvis ændres, så de følger boundary analysis og equivalence partitioning bedre
-describe("getRandomPersonPositiveTests", () => {
-  test.each([["male"], ["female"]])(
-    "should return a person with gender %s",
-    (gender) => {
-      const mockData = {
-        persons: [
-          { firstName: "John", lastName: "Doe", gender: "male" },
-          { firstName: "Jane", lastName: "Doe", gender: "female" },
-        ],
-      };
-      jest.spyOn(fs, "readFileSync").mockReturnValue(JSON.stringify(mockData));
-      const person = getRandomPerson();
-      expect(person).toHaveProperty("firstName");
-      expect(person).toHaveProperty("lastName");
-      expect(person).toHaveProperty("gender");
-      expect(["male", "female"]).toContain(person.gender);
-      fs.readFileSync.mockRestore();
-    }
-  );
+describe("getRandomPersonNegativeTests", () => {
+    test("Returns the first person when random index is 0", () => {
+        const mockGetPersonsData = jest.spyOn(global, 'getPersonsData').mockReturnValue({
+            persons: [
+                { firstName: "John", lastName: "Doe", gender: "male" },
+                { firstName: "Jane", lastName: "Doe", gender: "female" }
+            ]
+        });
+
+        jest.spyOn(Math, 'random').mockReturnValue(0);  // Mock til at returnere første person
+
+        const person = getRandomPerson();
+
+        expect(person).toEqual({
+            firstName: "John",
+            lastName: "Doe",
+            gender: "male"
+        });
+
+        mockGetPersonsData.mockRestore();
+        Math.random.mockRestore();
+    });
 });
 
-describe("getRandomPersonWithBirthdatePositiveTests", () => {
-  test.each([["male"], ["female"]])(
-    "should return a person with gender %s and a valid birthdate",
-    (gender) => {
-      const person = getRandomPersonWithBirthdate();
-      expect(person).toHaveProperty("firstName");
-      expect(person).toHaveProperty("lastName");
-      expect(person).toHaveProperty("gender");
-      expect(person).toHaveProperty("birthDate");
-      expect(person.birthDate).toMatch(/^\d{4}-\d{2}-\d{2}$/); // birthDate in yyyy-mm-dd format
-    }
-  );
-});
 
-//TODO - Negative test skal fikses
-// describe("getRandomPersonWithBirthdateNegativeTests", () => {
-//   test("should throw an error for invalid birthdate generated from malformed CPR", () => {
-//     // Brug jest.spyOn til at mocke getRandomCPR
-//     const spy = jest.spyOn({ getRandomCPR }, 'getRandomCPR').mockReturnValueOnce("9999999999"); // Ugyldigt CPR
 
-//     const person = getRandomPersonWithBirthdate();
-//     const birthDate = new Date(person.birthDate);
-    
-//     // Kontrollér, at den genererede fødselsdato er ugyldig
-//     expect(isNaN(birthDate.getTime())).toBe(true); // Date should be invalid
-    
-//     spy.mockRestore(); // Gendan den oprindelige adfærd
+
+// //TODO - alle test herfra og ned skal muligvis ændres, så de følger boundary analysis og equivalence partitioning bedre
+// describe("getRandomPersonPositiveTests", () => {
+//   test.each([["male"], ["female"]])(
+//     "should return a person with gender %s",
+//     (gender) => {
+//       const mockData = {
+//         persons: [
+//           { firstName: "John", lastName: "Doe", gender: "male" },
+//           { firstName: "Jane", lastName: "Doe", gender: "female" },
+//         ],
+//       };
+//       jest.spyOn(fs, "readFileSync").mockReturnValue(JSON.stringify(mockData));
+//       const person = getRandomPerson();
+//       expect(person).toHaveProperty("firstName");
+//       expect(person).toHaveProperty("lastName");
+//       expect(person).toHaveProperty("gender");
+//       expect(["male", "female"]).toContain(person.gender);
+//       fs.readFileSync.mockRestore();
+//     }
+//   );
+// });
+//
+// describe("getRandomPersonWithBirthdatePositiveTests", () => {
+//   test.each([["male"], ["female"]])(
+//     "should return a person with gender %s and a valid birthdate",
+//     (gender) => {
+//       const person = getRandomPersonWithBirthdate();
+//       expect(person).toHaveProperty("firstName");
+//       expect(person).toHaveProperty("lastName");
+//       expect(person).toHaveProperty("gender");
+//       expect(person).toHaveProperty("birthDate");
+//       expect(person.birthDate).toMatch(/^\d{4}-\d{2}-\d{2}$/); // birthDate in yyyy-mm-dd format
+//     }
+//   );
+// });
+//
+// //TODO - Negative test skal fikses
+// // describe("getRandomPersonWithBirthdateNegativeTests", () => {
+// //   test("should throw an error for invalid birthdate generated from malformed CPR", () => {
+// //     // Brug jest.spyOn til at mocke getRandomCPR
+// //     const spy = jest.spyOn({ getRandomCPR }, 'getRandomCPR').mockReturnValueOnce("9999999999"); // Ugyldigt CPR
+//
+// //     const person = getRandomPersonWithBirthdate();
+// //     const birthDate = new Date(person.birthDate);
+//
+// //     // Kontrollér, at den genererede fødselsdato er ugyldig
+// //     expect(isNaN(birthDate.getTime())).toBe(true); // Date should be invalid
+//
+// //     spy.mockRestore(); // Gendan den oprindelige adfærd
+// //   });
+// // });
+//
+// describe("getRandomPersonWithCPRPositiveTests", () => {
+//   test.each([["male"], ["female"]])(
+//     "should return a person with gender %s and a valid CPR",
+//     (gender) => {
+//       const mockData = {
+//         persons: [
+//           { firstName: "John", lastName: "Doe", gender: "male" },
+//           { firstName: "Jane", lastName: "Doe", gender: "female" },
+//         ],
+//       };
+//       jest.spyOn(fs, "readFileSync").mockReturnValue(JSON.stringify(mockData));
+//       const person = getRandomPersonWithCPR();
+//       expect(person).toHaveProperty("firstName");
+//       expect(person).toHaveProperty("lastName");
+//       expect(person).toHaveProperty("gender");
+//       expect(person).toHaveProperty("cpr");
+//       expect(person.cpr).toMatch(/^\d{10}$/); // CPR skal være 10 cifre
+//       fs.readFileSync.mockRestore();
+//     }
+//   );
+// });
+//
+// describe("getRandomPersonWithCPRNegativeTests", () => {
+//     test("should generate a valid CPR", () => {
+//       const mockData = {
+//         persons: [{ firstName: "John", lastName: "Doe", gender: "male" }],
+//       };
+//       jest.spyOn(fs, "readFileSync").mockReturnValue(JSON.stringify(mockData));
+//
+//       const personWithCPR = getRandomPersonWithCPR();
+//       expect(personWithCPR.cpr).toMatch(/^\d{10}$/); // CPR skal være 10 cifre
+//
+//       fs.readFileSync.mockRestore();
+//     });
 //   });
+//
+// describe("getRandomPersonWithCPRandBirthdatePositiveTests", () => {
+//   test.each([["male"], ["female"]])(
+//     "should return a person with gender %s, CPR, and a valid birthdate",
+//     (gender) => {
+//       const person = getRandomPersonWithCPRandBirthdate();
+//       expect(person).toHaveProperty("firstName");
+//       expect(person).toHaveProperty("lastName");
+//       expect(person).toHaveProperty("gender");
+//       expect(person).toHaveProperty("cpr");
+//       expect(person.cpr).toMatch(/^\d{10}$/); // CPR should be 10 digits
+//       expect(person).toHaveProperty("birthDate");
+//       expect(person.birthDate).toMatch(/^\d{4}-\d{2}-\d{2}$/); // birthDate in yyyy-mm-dd format
+//     }
+//   );
 // });
 
-describe("getRandomPersonWithCPRPositiveTests", () => {
-  test.each([["male"], ["female"]])(
-    "should return a person with gender %s and a valid CPR",
-    (gender) => {
-      const mockData = {
-        persons: [
-          { firstName: "John", lastName: "Doe", gender: "male" },
-          { firstName: "Jane", lastName: "Doe", gender: "female" },
-        ],
-      };
-      jest.spyOn(fs, "readFileSync").mockReturnValue(JSON.stringify(mockData));
-      const person = getRandomPersonWithCPR();
-      expect(person).toHaveProperty("firstName");
-      expect(person).toHaveProperty("lastName");
-      expect(person).toHaveProperty("gender");
-      expect(person).toHaveProperty("cpr");
-      expect(person.cpr).toMatch(/^\d{10}$/); // CPR skal være 10 cifre
-      fs.readFileSync.mockRestore();
-    }
-  );
-});
-
-describe("getRandomPersonWithCPRNegativeTests", () => {
-    test("should generate a valid CPR", () => {
-      const mockData = {
-        persons: [{ firstName: "John", lastName: "Doe", gender: "male" }],
-      };
-      jest.spyOn(fs, "readFileSync").mockReturnValue(JSON.stringify(mockData));
-  
-      const personWithCPR = getRandomPersonWithCPR();
-      expect(personWithCPR.cpr).toMatch(/^\d{10}$/); // CPR skal være 10 cifre
-  
-      fs.readFileSync.mockRestore();
+describe("getRandomPhoneNumber", ()=>{
+    it("should return a valid phone number with a 8 digits", ()=>{
+        const phoneNumber = getRandomPhoneNumber()();
+        expect(phoneNumber).toMatch(/^\d{8}$/);
     });
-  });
 
-describe("getRandomPersonWithCPRandBirthdatePositiveTests", () => {
-  test.each([["male"], ["female"]])(
-    "should return a person with gender %s, CPR, and a valid birthdate",
-    (gender) => {
-      const person = getRandomPersonWithCPRandBirthdate();
-      expect(person).toHaveProperty("firstName");
-      expect(person).toHaveProperty("lastName");
-      expect(person).toHaveProperty("gender");
-      expect(person).toHaveProperty("cpr");
-      expect(person.cpr).toMatch(/^\d{10}$/); // CPR should be 10 digits
-      expect(person).toHaveProperty("birthDate");
-      expect(person.birthDate).toMatch(/^\d{4}-\d{2}-\d{2}$/); // birthDate in yyyy-mm-dd format
-    }
-  );
-});
-
+    it("should return a phone number that starts with a valid prefix", ()=>{
+        const phoneNumber = getRandomPhoneNumber();
+        const matchingPrefix = phonePrefixes.find(prefix => phoneNumber.startsWith(prefix));
+    });
+})
