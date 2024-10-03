@@ -195,31 +195,51 @@ describe("getRandomPerson - Positive Tests", () => {
   });
 });
 
-describe("getRandomPersonNegativeTests", () => {
-  test("Returns the first person when random index is 0", () => {
-    const mockGetPersonsData = jest
-      .spyOn(global, "getPersonsData")
-      .mockReturnValue({
-        persons: [
-          { firstName: "John", lastName: "Doe", gender: "male" },
-          { firstName: "Jane", lastName: "Doe", gender: "female" },
-        ],
-      });
+describe("getRandomPerson - Negative Tests", () => {
+  let getPersonsData, getRandomPerson;
 
-    jest.spyOn(Math, "random").mockReturnValue(0); // Mock til at returnere første person
+  beforeEach(async () => {
+    const module = await import("../src/fakeInfoFunctions");
 
-    const person = getRandomPerson();
+    getPersonsData = module.getPersonsData;
+    getRandomPerson = module.getRandomPerson;
 
-    expect(person).toEqual({
-      firstName: "John",
-      lastName: "Doe",
-      gender: "male",
+    // Only mock getPersonsData, not getRandomPerson
+    getPersonsData = jest.fn(); // Mock the getPersonsData function
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks(); // Clear all mocks after each test
+  });
+
+  test("should throw an error if getPersonsData returns undefined", () => {
+    getPersonsData.mockReturnValue(undefined);
+    expect(() => getRandomPerson()).toThrow("No persons found in the data file");
+  });
+
+  test("should throw an error if the persons array is empty", () => {
+    getPersonsData.mockReturnValue({ persons: [] });
+    expect(() => getRandomPerson()).toThrow("No persons found in the data file");
+  });
+
+  test("should throw an error if persons is not an array", () => {
+    getPersonsData.mockReturnValue({ persons: null });
+    expect(() => getRandomPerson()).toThrow("No persons found in the data file");
+  });
+
+  test("should throw an error if a person is missing firstName or lastName", () => {
+    getPersonsData.mockReturnValue({
+      persons: [{ lastName: "Doe", gender: "Male" }], // Missing firstName
     });
+    expect(() => getRandomPerson()).toThrow("No persons found in the data file");
+  });
 
-    mockGetPersonsData.mockRestore();
-    Math.random.mockRestore();
+  test("should throw an error if getPersonsData returns null", () => {
+    getPersonsData.mockReturnValue(null);
+    expect(() => getRandomPerson()).toThrow("No persons found in the data file");
   });
 });
+
 
 // //TODO - alle test herfra og ned skal muligvis ændres, så de følger boundary analysis og equivalence partitioning bedre
 // describe("getRandomPersonPositiveTests", () => {

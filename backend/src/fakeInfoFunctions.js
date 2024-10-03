@@ -94,20 +94,29 @@ const getPersonsData = () => {
   }
 };
 
-// Funktion der henter en tilfældig person fra json filen
 const getRandomPerson = () => {
   const personsData = getPersonsData();
 
-  if (!personsData) {
+  // Check if personsData is undefined or null
+  if (!personsData || !personsData.persons) {
     throw new Error("Unable to load data from person-names.json");
   }
 
   const persons = personsData.persons;
 
-  if (persons.length === 0) {
+  // Check if persons is not an array or the array is empty
+  if (!Array.isArray(persons) || persons.length === 0) {
     throw new Error("No persons available in the data file");
   }
 
+  // Validate each person entry (check for missing firstName, lastName, or gender)
+  persons.forEach((person) => {
+    if (!person.firstName || !person.lastName || !person.gender) {
+      throw new Error("Invalid person data");
+    }
+  });
+
+  // Choose a random person from the list
   const randomIndex = Math.floor(Math.random() * persons.length);
   const randomPerson = persons[randomIndex];
 
