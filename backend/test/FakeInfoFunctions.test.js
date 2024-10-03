@@ -69,50 +69,71 @@ describe("getBirthDateFromCPRNegativeTests", () => {
   );
 });
 
-describe("getPersonsDataPositiveTests", () => {
-  test("should return valid persons data when the file is available", () => {
-    const mockData = {
-      persons: [{ firstName: "John", lastName: "Doe", gender: "male" }],
-    };
-    jest.spyOn(fs, "readFileSync").mockReturnValue(JSON.stringify(mockData));
-    const data = getPersonsData();
-    expect(data).toEqual(mockData);
-    fs.readFileSync.mockRestore(); // Restore the mock after test
-  });
+describe("getPersonsData - Positive Tests", () => {
+  test.each([
+    [
+      "should return parsed data when the file contains valid persons data", 
+      JSON.stringify({ persons: [{ firstName: "John", lastName: "Doe" }] }), 
+      1, 
+      "John"
+    ],
+    [
+      "should return parsed data when the file contains exactly one person (boundary case)", 
+      JSON.stringify({ persons: [{ firstName: "Solo", lastName: "One" }] }), 
+      1, 
+      "Solo"
+    ]
+  ])(
+    "%s",
+    (testDescription, mockFileData, expectedLength, expectedFirstName) => {
+      jest.spyOn(fs, 'readFileSync').mockReturnValue(mockFileData);
+      const data = getPersonsData();
+      
+      expect(data.persons).toHaveLength(expectedLength);
+      expect(data.persons[0].firstName).toBe(expectedFirstName);
+    }
+  );
 });
 
-describe("getPersonsDataNegativeTests", () => {
-  test("should throw an error when no persons are found", () => {
-    const mockData = { persons: [] };
-    jest.spyOn(fs, "readFileSync").mockReturnValue(JSON.stringify(mockData));
-
-    expect(() => getPersonsData()).toThrow(
+describe("getPersonsData - Negative Tests", () => {
+  test.each([
+    [
+      "should throw an error if the file does not exist", 
+      () => { throw new Error("File not found"); }, 
       "Error reading or parsing person-names.json"
-    );
-    fs.readFileSync.mockRestore(); // Gendan original funktionalitet
-  });
-  test("should throw an error when file cannot be read", () => {
-    jest.spyOn(fs, "readFileSync").mockImplementation(() => {
-      throw new Error("Error reading or parsing person-names.json");
-    });
-    expect(() => getPersonsData()).toThrow(
+    ],
+    [
+      "should throw an error if the file contains invalid JSON", 
+      "Invalid JSON", 
       "Error reading or parsing person-names.json"
-    );
-    fs.readFileSync.mockRestore();
-  });
-});
+    ],
+    [
+      "should throw an error if the persons array is empty", 
+      JSON.stringify({ persons: [] }), 
+      "No persons found in the data file"
+    ],
+    [
+      "should throw an error if the persons key is not an array", 
+      JSON.stringify({ persons: "Not an array" }), 
+      "No persons found in the data file"
+    ],
+    [
+      "should throw an error if the file is missing the persons array", 
+      JSON.stringify({ noPersons: [] }), 
+      "No persons found in the data file"
+    ]
+  ])(
+    "%s",
+    (testDescription, mockFileData, expectedError) => {
+      if (typeof mockFileData === "function") {
+        jest.spyOn(fs, 'readFileSync').mockImplementation(mockFileData);
+      } else {
+        jest.spyOn(fs, 'readFileSync').mockReturnValue(mockFileData);
+      }
 
-// Boundary Analysis: Handle case with exactly one person
-describe("getPersonsDataBoundaryTests", () => {
-  test("should return data for exactly one person in file", () => {
-    const mockData = {
-      persons: [{ firstName: "John", lastName: "Doe", gender: "male" }],
-    };
-    jest.spyOn(fs, "readFileSync").mockReturnValue(JSON.stringify(mockData));
-    const data = getPersonsData();
-    expect(data.persons).toHaveLength(1); // Boundary: Exactly one person
-    fs.readFileSync.mockRestore();
-  });
+      expect(() => getPersonsData()).toThrow(expectedError);
+    }
+  );
 });
 
 // Boundary Analysis: Test with file containing only one male or one female

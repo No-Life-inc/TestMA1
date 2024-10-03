@@ -75,6 +75,7 @@ const getPersonsData = () => {
 
     const parsedData = JSON.parse(data);
 
+    // Handle specific case where persons array is missing or empty
     if (
       !parsedData ||
       !Array.isArray(parsedData.persons) ||
@@ -85,6 +86,10 @@ const getPersonsData = () => {
 
     return parsedData;
   } catch (error) {
+    // If the error message is specific to persons array, do not overwrite it
+    if (error.message === "No persons found in the data file") {
+      throw error;
+    }
     throw new Error("Error reading or parsing person-names.json");
   }
 };
