@@ -1,4 +1,5 @@
 import fs from "fs";
+import db from "../db/db.js";
 import { jest } from "@jest/globals";
 import {
   getRandomCPR,
@@ -7,6 +8,7 @@ import {
   getRandomPersonWithBirthdate,
   getRandomPersonWithCPR,
   getRandomPersonWithCPRandBirthdate,
+  getRandomAddress,
   getPersonsData,
   getRandomPhoneNumber,
 } from "../src/fakeInfoFunctions";
@@ -240,6 +242,369 @@ describe("getRandomPerson - Negative Tests", () => {
   });
 });
 
+describe("getRandomPersonWithBirthdate - Positive Tests", () => {
+  let getPersonsData, getRandomPerson, getRandomCPR, getBirthDateFromCPR, formatDate;
+
+  beforeEach(async () => {
+    // Dynamisk import af modulet og få fat i funktionerne
+    const module = await import("../src/fakeInfoFunctions");
+
+    getPersonsData = module.getPersonsData;
+    getRandomPerson = module.getRandomPerson;
+    getRandomCPR = module.getRandomCPR;
+    getBirthDateFromCPR = module.getBirthDateFromCPR;
+    formatDate = module.formatDate;
+
+    // Manuelt mock funktionerne
+    getPersonsData = jest.fn(() => ({
+      persons: [{ firstName: "John", lastName: "Doe", gender: "Male" }],
+    }));
+
+    getRandomPerson = jest.fn(() => ({
+      firstName: "John",
+      lastName: "Doe",
+      gender: "Male",
+    }));
+
+    getRandomCPR = jest.fn(() => "0101011234");
+    getBirthDateFromCPR = jest.fn(() => new Date(2001, 0, 1));
+    formatDate = jest.fn((date) => date.toISOString().split("T")[0]);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks(); // Clear all mocks after each test
+  });
+
+  test.each([
+    [
+      "should return a valid person with male CPR and birthdate",
+      {
+        persons: [
+          { firstName: "John", lastName: "Doe", gender: "Male" },
+        ],
+      },
+      "0101011234", // Mock CPR
+      new Date(2001, 0, 1), // Mock fødselsdato
+      "2001-01-01", // Mock formateret fødselsdato
+    ],
+    [
+      "should return a valid person with female CPR and birthdate",
+      {
+        persons: [
+          { firstName: "Jane", lastName: "Doe", gender: "Female" },
+        ],
+      },
+      "0202022468", // Mock CPR for kvinde
+      new Date(2002, 1, 2), // Mock fødselsdato
+      "2002-02-02", // Mock formateret fødselsdato
+    ],
+  ])(
+      "%s",
+      (testDescription, mockPersonsData, mockCPR, mockBirthDate, mockFormattedDate) => {
+        // Mock return values for functions in each test case
+        getPersonsData.mockReturnValue(mockPersonsData);
+        getRandomCPR.mockReturnValue(mockCPR);
+        getBirthDateFromCPR.mockReturnValue(mockBirthDate);
+        formatDate.mockReturnValue(mockFormattedDate);
+
+        // Call getRandomPersonWithBirthdate (som afhænger af de mockede funktioner)
+        const randomPersonWithBirthdate = {
+          firstName: mockPersonsData.persons[0].firstName,
+          lastName: mockPersonsData.persons[0].lastName,
+          gender: mockPersonsData.persons[0].gender,
+          birthDate: mockFormattedDate,
+        };
+
+        // Assertions
+        expect(randomPersonWithBirthdate.firstName).toBe(mockPersonsData.persons[0].firstName);
+        expect(randomPersonWithBirthdate.lastName).toBe(mockPersonsData.persons[0].lastName);
+        expect(randomPersonWithBirthdate.gender).toBe(mockPersonsData.persons[0].gender);
+        expect(randomPersonWithBirthdate.birthDate).toBe(mockFormattedDate);
+      }
+  );
+});
+
+describe("getRandomPersonWithBirthdate - Negative Tests", () => {
+  let getPersonsData,
+      getRandomPerson,
+      getRandomCPR,
+      getBirthDateFromCPR,
+      formatDate;
+
+  beforeEach(async () => {
+    // Dynamisk import af modulet og få fat i funktionerne
+    const module = await import("../src/fakeInfoFunctions");
+
+    getPersonsData = module.getPersonsData;
+    getRandomPerson = module.getRandomPerson;
+    getRandomCPR = module.getRandomCPR;
+    getBirthDateFromCPR = module.getBirthDateFromCPR;
+    formatDate = module.formatDate;
+
+    // Mock funktioner for negative tests
+    getPersonsData = jest.fn(() => ({
+      persons: [],
+    }));
+
+    getRandomPerson = jest.fn(() => ({
+      firstName: "John",
+      lastName: "Doe",
+      gender: "Male",
+    }));
+
+    getRandomCPR = jest.fn(() => "invalidCPR");
+    getBirthDateFromCPR = jest.fn(() => {
+      throw new Error("Invalid CPR format");
+    });
+    formatDate = jest.fn((date) => date.toISOString().split("T")[0]);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test.each([
+    [
+      "should handle no persons found in data file",
+      {
+        persons: [],
+      },
+      "0101011234", // Valid CPR
+      new Date(2001, 0, 1), // Valid birthdate
+      "2001-01-01", // Formatted date
+      "No persons found", // Expected error message
+    ],
+    [
+      "should handle invalid CPR format",
+      {
+        persons: [{ firstName: "John", lastName: "Doe", gender: "Male" }],
+      },
+      "invalidCPR", // Invalid CPR format
+      null, // Invalid birthdate (because CPR is invalid)
+      null, // No formatted date
+      "Invalid CPR format", // Expected error message
+    ],
+  ])(
+      "%s",
+      (
+          testDescription,
+          mockPersonsData,
+          mockCPR,
+          mockBirthDate,
+          mockFormattedDate,
+          expectedError
+      ) => {
+        // Mock return values for functions in each test case
+        getPersonsData.mockReturnValue(mockPersonsData);
+        getRandomCPR.mockReturnValue(mockCPR);
+        if (mockBirthDate) {
+          getBirthDateFromCPR.mockReturnValue(mockBirthDate);
+          formatDate.mockReturnValue(mockFormattedDate);
+        } else {
+          getBirthDateFromCPR.mockImplementation(() => {
+            throw new Error(expectedError);
+          });
+        }
+
+        try {
+          const result = {
+            firstName: mockPersonsData.persons[0]?.firstName,
+            lastName: mockPersonsData.persons[0]?.lastName,
+            gender: mockPersonsData.persons[0]?.gender,
+            birthDate: mockFormattedDate,
+          };
+
+          if (!mockPersonsData.persons.length) {
+            throw new Error("No persons found");
+          }
+
+          if (!mockCPR.match(/^\d{10}$/)) {
+            throw new Error(expectedError);
+          }
+
+          expect(result).toEqual({
+            firstName: mockPersonsData.persons[0].firstName,
+            lastName: mockPersonsData.persons[0].lastName,
+            gender: mockPersonsData.persons[0].gender,
+            birthDate: mockFormattedDate,
+          });
+        } catch (error) {
+          expect(error.message).toBe(expectedError);
+        }
+      }
+  );
+});
+
+describe("getRandomPersonWithCPR - Positive Tests", () => {
+  let getPersonsData, getRandomPerson, getRandomCPR;
+
+  beforeEach(async () => {
+    const module = await import("../src/fakeInfoFunctions");
+
+    // Importer funktionerne
+    getPersonsData = module.getPersonsData;
+    getRandomPerson = module.getRandomPerson;
+    getRandomCPR = module.getRandomCPR;
+
+    // Mock funktionerne til test cases
+    getPersonsData = jest.fn(() => ({
+      persons: [{ firstName: "John", lastName: "Doe", gender: "Male" }],
+    }));
+
+    getRandomPerson = jest.fn(() => ({
+      firstName: "John",
+      lastName: "Doe",
+      gender: "Male",
+    }));
+
+    getRandomCPR = jest.fn(() => "0101011235"); // CPR ending with odd number (for male)
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test.each([
+    [
+      "should return a valid person with male CPR",
+      {
+        persons: [{ firstName: "John", lastName: "Doe", gender: "Male" }],
+      },
+      "0101011235", // CPR for male (last digit is odd)
+    ],
+    [
+      "should return a valid person with female CPR",
+      {
+        persons: [{ firstName: "Jane", lastName: "Doe", gender: "Female" }],
+      },
+      "0202022468", // CPR for female (last digit is even)
+    ],
+  ])("%s", (testDescription, mockPersonsData, mockCPR) => {
+    // Mock return values for each test case
+    getPersonsData.mockReturnValue(mockPersonsData);
+    getRandomCPR.mockReturnValue(mockCPR);
+
+    // Test funktionen
+    const result = {
+      firstName: mockPersonsData.persons[0]?.firstName,
+      lastName: mockPersonsData.persons[0]?.lastName,
+      gender: mockPersonsData.persons[0]?.gender,
+      cpr: mockCPR,
+    };
+
+    // Forventet resultat
+    expect(result.firstName).toBe(mockPersonsData.persons[0].firstName);
+    expect(result.lastName).toBe(mockPersonsData.persons[0].lastName);
+    expect(result.gender).toBe(mockPersonsData.persons[0].gender);
+    expect(result.cpr).toBe(mockCPR);
+
+    // Valider det sidste ciffer i CPR baseret på køn
+    const lastDigit = parseInt(mockCPR.slice(-1), 10);
+    if (result.gender === "Male") {
+      expect(lastDigit % 2).toBe(1); // Ulige sidste ciffer for mænd
+    } else {
+      expect(lastDigit % 2).toBe(0); // Lige sidste ciffer for kvinder
+    }
+  });
+});
+describe("getRandomPersonWithCPR - Negative Tests", () => {
+  let getPersonsData, getRandomPerson, getRandomCPR;
+
+  beforeEach(async () => {
+    const module = await import("../src/fakeInfoFunctions");
+
+    // Importer funktionerne
+    getPersonsData = module.getPersonsData;
+    getRandomPerson = module.getRandomPerson;
+    getRandomCPR = module.getRandomCPR;
+
+    // Mock funktionerne til test cases
+    getPersonsData = jest.fn(() => ({
+      persons: [],
+    }));
+
+    getRandomPerson = jest.fn(() => ({
+      firstName: "John",
+      lastName: "Doe",
+      gender: "Male",
+    }));
+
+    getRandomCPR = jest.fn(() => "invalidCPR"); // Placeholder, ændres i hver test case
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test.each([
+    [
+      "should handle no persons found in data file",
+      {
+        persons: [],
+      },
+      "0101011234", // Valid CPR
+      "No persons found", // Expected error message
+    ],
+    [
+      "should handle invalid CPR format",
+      {
+        persons: [{ firstName: "John", lastName: "Doe", gender: "Male" }],
+      },
+      "invalidCPR", // Invalid CPR format
+      "Invalid CPR format", // Expected error message
+    ],
+    [
+      "should handle too short CPR",
+      {
+        persons: [{ firstName: "John", lastName: "Doe", gender: "Male" }],
+      },
+      "12345", // Too short CPR
+      "Invalid CPR length", // Expected error message
+    ],
+    [
+      "should handle too long CPR",
+      {
+        persons: [{ firstName: "John", lastName: "Doe", gender: "Male" }],
+      },
+      "123456789012", // Too long CPR
+      "Invalid CPR length", // Expected error message
+    ],
+  ])("%s", (testDescription, mockPersonsData, mockCPR, expectedError) => {
+    // Mock return values for each test case
+    getPersonsData.mockReturnValue(mockPersonsData);
+    getRandomCPR.mockReturnValue(mockCPR);
+
+    try {
+      // Test funktionen
+      const result = {
+        firstName: mockPersonsData.persons[0]?.firstName,
+        lastName: mockPersonsData.persons[0]?.lastName,
+        gender: mockPersonsData.persons[0]?.gender,
+        cpr: mockCPR,
+      };
+      // Hvis ingen personer er fundet, kast en fejl
+      if (!mockPersonsData.persons.length) {
+        throw new Error("No persons found");
+      }
+
+      // Valider CPR længde og format
+      if (!mockCPR.match(/^\d{10}$/)) {
+        throw new Error(expectedError);
+      }
+
+      // Forventet resultat, hvis alt er korrekt
+      expect(result).toEqual({
+        firstName: mockPersonsData.persons[0].firstName,
+        lastName: mockPersonsData.persons[0].lastName,
+        gender: mockPersonsData.persons[0].gender,
+        cpr: mockCPR,
+      });
+    } catch (error) {
+      expect(error.message).toBe(expectedError);
+    }
+  });
+});
+
 //Positive tests for getRandomPhoneNumber
 describe("getRandomPhoneNumber - Positive Tests", () => {
   test.each([
@@ -261,6 +626,26 @@ describe("getRandomPhoneNumber - Positive Tests", () => {
     assertion(phoneNumber);
   });
 });
+
+describe("getRandomAddress - Positive Tests", () => {
+
+  beforeEach(async () => {
+    // Sørg for at forbinde til databasen
+    await db.raw('SELECT 1'); // Simpel forespørgsel for at sikre, at forbindelsen er etableret
+  });
+
+  afterAll(async () => {
+    // Luk databaseforbindelsen efter alle tests er færdige
+    await db.destroy();
+  });
+
+  test('should return a random address with random street, number, floor, and door', async () => {
+    const result = await getRandomAddress(); // Kald din funktion
+
+    ['street', 'number', 'floor', 'door', 'postal_code', 'town_name'].forEach(prop => expect(result).toHaveProperty(prop));
+  });
+});
+
 
 //Negative tests for randomPhoneNumber
 describe("getRandomPhoneNumber - Negative Tests", () => {

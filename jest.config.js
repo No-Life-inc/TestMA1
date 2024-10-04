@@ -1,4 +1,6 @@
 export default {
-  testEnvironment: 'jest-environment-node', // or 'jest-environment-jsdom' depending on your needs
-  transform: {},  // Disable transformations to allow native ESM
+  testEnvironment: 'jest-environment-node',
+  transform: {},  // Deaktiver transformering hvis nødvendigt for ESM
+  setupFiles: ['dotenv/config'],
+  setupFilesAfterEnv: ["dotenv/config"]
 };

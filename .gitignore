@@ -300,3 +300,4 @@ pyrightconfig.json
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,intellij,python,java
+/backend/.env
