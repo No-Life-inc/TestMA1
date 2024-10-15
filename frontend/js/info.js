@@ -1,1 +1,1 @@
-export const baseUrl = 'http://localhost/php_fake_info';
+export const baseUrl = 'http://localhost:5000/api';

@@ -6,13 +6,41 @@ document.querySelector('#frmGenerate').addEventListener('submit', (e) => {
     // The endpoint is inferred from the selected option
     let endpoint = '/';
     if (e.target.chkPerson.checked) {
-        endpoint += 'person'
         const numPersons = parseInt(e.target.txtNumberPersons.value);
         if (numPersons > 1) {
-            endpoint += '?n=' + numPersons;
+            endpoint += `bulk/${numPersons}`;
+        } else {
+            endpoint += 'person';
         }
-    } else {
-        endpoint += e.target.cmbPartialOptions.value;
+    }  else {
+        // Map the selected value to the correct endpoint
+        const option = e.target.cmbPartialOptions.value;
+        switch (option) {
+            case 'cpr':
+                endpoint += 'cpr';
+                break;
+            case 'name-gender':
+                endpoint += 'person'; // Since your /person endpoint returns name and gender
+                break;
+            case 'name-gender-dob':
+                endpoint += 'person-dob';
+                break;
+            case 'cpr-name-gender':
+                endpoint += 'person-cpr';
+                break;
+            case 'cpr-name-gender-dob':
+                endpoint += 'person-cpr-dob';
+                break;
+            case 'address':
+                endpoint += 'address';
+                break;
+            case 'phone':
+                endpoint += 'phone';
+                break;
+            default:
+                console.error('Invalid option selected');
+                return;
+        }
     }
 
     // API call
@@ -38,9 +66,11 @@ const handlePersonData = (data) => {
 
     data.forEach(item => {
         const personCard = document.importNode(document.getElementById('personTemplate').content, true);
-        if (item.CPR !== undefined) {
+        console.log('Person Data:', item); // Log the item to inspect its properties
+
+        if (item.cpr !== undefined) {
             const cprValue = personCard.querySelector('.cprValue');
-            cprValue.innerText = item.CPR;
+            cprValue.innerText = item.cpr;
             cprValue.classList.remove('hidden');
             personCard.querySelector('.cpr').classList.remove('hidden');
         }
@@ -67,11 +97,21 @@ const handlePersonData = (data) => {
             personCard.querySelector('.dob').classList.remove('hidden');
         }
         if (item.address !== undefined) {
+            // Address is in the expected "address" object
             const streetValue = personCard.querySelector('.streetValue');
             streetValue.innerText = `${item.address.street} ${item.address.number}, ${item.address.floor}.${item.address.door}`;
             streetValue.classList.remove('hidden');
             const townValue = personCard.querySelector('.townValue');
             townValue.innerText = `${item.address.postal_code} ${item.address.town_name}`;
+            townValue.classList.remove('hidden');
+            personCard.querySelector('.address').classList.remove('hidden');
+        } else if (item.street !== undefined && item.number !== undefined) {
+            // Address properties are directly on the root object
+            const streetValue = personCard.querySelector('.streetValue');
+            streetValue.innerText = `${item.street} ${item.number}, ${item.floor}.${item.door}`;
+            streetValue.classList.remove('hidden');
+            const townValue = personCard.querySelector('.townValue');
+            townValue.innerText = `${item.postal_code} ${item.town_name}`;
             townValue.classList.remove('hidden');
             personCard.querySelector('.address').classList.remove('hidden');
         }
