@@ -512,19 +512,4 @@ describe("getRandomAddress - Positive Tests", () => {
     });
   });
 
-  // beforeEach(async () => {
-  //   // Make sure the database connection is established before running the tests
-  //   await db.raw('SELECT 1'); // Simple query to check if the connection is working
-  // });
-
-  // afterAll(async () => {
-  //   // Close the database connection after all tests have run
-  //   await db.destroy();
-  // });
-
-  // test('should return a random address with random street, number, floor, and door', async () => {
-  //   const result = await getRandomAddress(); 
-
-  //   ['street', 'number', 'floor', 'door', 'postal_code', 'town_name'].forEach(prop => expect(result).toHaveProperty(prop));
-  // });
 });

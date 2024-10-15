@@ -3,7 +3,7 @@ import pkg from "knex";
 const { Knex } = pkg;
 
 // Load environment variables from a .env file
-dotenv.config();
+dotenv.config({path: "../../.env"});
 
 const config = {
   client: "mysql2",
