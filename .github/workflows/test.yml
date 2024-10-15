@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - development
+      - workflow
 
 env:
   DB_USER: root
