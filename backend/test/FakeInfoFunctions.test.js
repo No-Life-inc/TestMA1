@@ -193,7 +193,7 @@ describe("getRandomPersonWithBirthdate - Positive Tests", () => {
   let getPersonsData, getRandomPerson, getRandomCPR, getBirthDateFromCPR, formatDate;
 
   beforeEach(async () => {
-    // Dynamisk import af modulet og få fat i funktionerne
+    // Dynamic import of the module and get the functions
     const module = await import("../src/fakeInfoFunctions");
 
     getPersonsData = module.getPersonsData;
@@ -202,7 +202,7 @@ describe("getRandomPersonWithBirthdate - Positive Tests", () => {
     getBirthDateFromCPR = module.getBirthDateFromCPR;
     formatDate = module.formatDate;
 
-    // Manuelt mock funktionerne
+    // Make sure to mock the functions for each test case
     getPersonsData = jest.fn(() => ({
       persons: [{ firstName: "John", lastName: "Doe", gender: "Male" }],
     }));
@@ -231,8 +231,8 @@ describe("getRandomPersonWithBirthdate - Positive Tests", () => {
         ],
       },
       "0101011234", // Mock CPR
-      new Date(2001, 0, 1), // Mock fødselsdato
-      "2001-01-01", // Mock formateret fødselsdato
+      new Date(2001, 0, 1), // Mock birthdate
+      "2001-01-01", // Mock formatted birthdate
     ],
     [
       "should return a valid person with female CPR and birthdate",
@@ -241,9 +241,9 @@ describe("getRandomPersonWithBirthdate - Positive Tests", () => {
           { firstName: "Jane", lastName: "Doe", gender: "Female" },
         ],
       },
-      "0202022468", // Mock CPR for kvinde
-      new Date(2002, 1, 2), // Mock fødselsdato
-      "2002-02-02", // Mock formateret fødselsdato
+      "0202022468", // Mock CPR for woman
+      new Date(2002, 1, 2), // Mock birthdate
+      "2002-02-02", // Mock formatted birthdate
     ],
   ])(
       "%s",
@@ -254,7 +254,7 @@ describe("getRandomPersonWithBirthdate - Positive Tests", () => {
         getBirthDateFromCPR.mockReturnValue(mockBirthDate);
         formatDate.mockReturnValue(mockFormattedDate);
 
-        // Call getRandomPersonWithBirthdate (som afhænger af de mockede funktioner)
+        // Call getRandomPersonWithBirthdate (depended on the mocked functions)
         const randomPersonWithBirthdate = {
           firstName: mockPersonsData.persons[0].firstName,
           lastName: mockPersonsData.persons[0].lastName,
@@ -279,7 +279,7 @@ describe("getRandomPersonWithBirthdate - Negative Tests", () => {
       formatDate;
 
   beforeEach(async () => {
-    // Dynamisk import af modulet og få fat i funktionerne
+    // Dynamic import of the module and get the functions
     const module = await import("../src/fakeInfoFunctions");
 
     getPersonsData = module.getPersonsData;
@@ -288,7 +288,7 @@ describe("getRandomPersonWithBirthdate - Negative Tests", () => {
     getBirthDateFromCPR = module.getBirthDateFromCPR;
     formatDate = module.formatDate;
 
-    // Mock funktioner for negative tests
+    // Mock the functions for each test case
     getPersonsData = jest.fn(() => ({
       persons: [],
     }));
@@ -388,12 +388,12 @@ describe("getRandomPersonWithCPR - Positive Tests", () => {
   beforeEach(async () => {
     const module = await import("../src/fakeInfoFunctions");
 
-    // Importer funktionerne
+    // import the functions
     getPersonsData = module.getPersonsData;
     getRandomPerson = module.getRandomPerson;
     getRandomCPR = module.getRandomCPR;
 
-    // Mock funktionerne til test cases
+    // Mock the functions for each test case
     getPersonsData = jest.fn(() => ({
       persons: [{ firstName: "John", lastName: "Doe", gender: "Male" }],
     }));
@@ -431,7 +431,7 @@ describe("getRandomPersonWithCPR - Positive Tests", () => {
     getPersonsData.mockReturnValue(mockPersonsData);
     getRandomCPR.mockReturnValue(mockCPR);
 
-    // Test funktionen
+    // Test the function
     const result = {
       firstName: mockPersonsData.persons[0]?.firstName,
       lastName: mockPersonsData.persons[0]?.lastName,
@@ -439,18 +439,18 @@ describe("getRandomPersonWithCPR - Positive Tests", () => {
       cpr: mockCPR,
     };
 
-    // Forventet resultat
+    // expected result
     expect(result.firstName).toBe(mockPersonsData.persons[0].firstName);
     expect(result.lastName).toBe(mockPersonsData.persons[0].lastName);
     expect(result.gender).toBe(mockPersonsData.persons[0].gender);
     expect(result.cpr).toBe(mockCPR);
 
-    // Valider det sidste ciffer i CPR baseret på køn
+    // Validate the last digit of the CPR
     const lastDigit = parseInt(mockCPR.slice(-1), 10);
     if (result.gender === "Male") {
-      expect(lastDigit % 2).toBe(1); // Ulige sidste ciffer for mænd
+      expect(lastDigit % 2).toBe(1); // uneven last digit
     } else {
-      expect(lastDigit % 2).toBe(0); // Lige sidste ciffer for kvinder
+      expect(lastDigit % 2).toBe(0); // even last digit
     }
   });
 });
@@ -460,12 +460,12 @@ describe("getRandomPersonWithCPR - Negative Tests", () => {
   beforeEach(async () => {
     const module = await import("../src/fakeInfoFunctions");
 
-    // Importer funktionerne
+    // import the functions
     getPersonsData = module.getPersonsData;
     getRandomPerson = module.getRandomPerson;
     getRandomCPR = module.getRandomCPR;
 
-    // Mock funktionerne til test cases
+    // Mock the functions for each test case
     getPersonsData = jest.fn(() => ({
       persons: [],
     }));
