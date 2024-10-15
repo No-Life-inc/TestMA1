@@ -11,6 +11,8 @@ import {
   getRandomAddress,
   getPersonsData,
   getRandomPhoneNumber,
+  getRandomPersonFullInfo,
+  getRandomPersonsBulk,
 } from "../src/fakeInfoFunctions";
 import { phonePrefixes } from "../data/phonePrefixData.js";
 
@@ -511,3 +513,52 @@ describe("getRandomAddress - Positive Tests", () => {
   });
 });
 
+describe("getRandomPersonFullInfo - Positive Tests", () => {
+  test("should return a random person with full information", async () => {
+    const result = await getRandomPersonFullInfo();
+
+    ['firstName', 'lastName', 'gender', 'birthDate', 'cpr', 'address', 'phoneNumber'].forEach(prop => {
+      expect(result).toHaveProperty(prop);
+      expect(result[prop]).not.toBeNull();
+      expect(result[prop]).not.toBeUndefined();
+    });
+
+    const addressProps = ['street', 'number', 'floor', 'door', 'postal_code', 'town_name'];
+    addressProps.forEach(prop => {
+      expect(result.address).toHaveProperty(prop);
+      expect(result.address[prop]).not.toBeNull();
+      expect(result.address[prop]).not.toBeUndefined();
+    });
+  }
+  );
+}
+);
+
+describe("getRandomPersonsBulk - Positive Tests", () => {
+  test('should return an array of random persons with full information', async () => {
+    const count = 5;
+    const result = await getRandomPersonsBulk(count);
+
+    // Ensure the result is an array of the correct length
+    expect(result).toHaveLength(count);
+
+    // Check the structure of the first person object
+    const person = result[0];
+
+    // Verify the main properties
+    ['firstName', 'lastName', 'gender', 'birthDate', 'cpr', 'address', 'phoneNumber'].forEach(prop => {
+        expect(person).toHaveProperty(prop);
+        expect(person[prop]).not.toBeNull();
+        expect(person[prop]).not.toBeUndefined();
+    });
+
+    // Verify the address properties
+    const addressProps = ['street', 'number', 'floor', 'door', 'postal_code', 'town_name'];
+    addressProps.forEach(prop => {
+        expect(person.address).toHaveProperty(prop);
+        expect(person.address[prop]).not.toBeNull();
+        expect(person.address[prop]).not.toBeUndefined();
+    });
+});
+}
+);

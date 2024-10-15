@@ -1,0 +1,62 @@
+name: Run Backend Tests
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:5.7
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.DB_NAME }}
+          MYSQL_USER: ${{ secrets.DB_USER }}
+          MYSQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -u ${{ secrets.DB_USER }} -p${{ secrets.DB_PASSWORD }}" 
+          --health-interval=10s 
+          --health-timeout=5s 
+          --health-retries=5
+
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x, 18.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./backend
+
+      - name: Wait for MySQL to be ready
+        run: |
+          until mysqladmin ping -h "127.0.0.1" --silent; do
+            echo 'waiting for mysql to be ready...'
+            sleep 5
+          done
+
+      - name: Run migrations
+        run: npx knex migrate:latest
+        working-directory: ./backend
+
+      - name: Run seeds
+        run: npx knex seed:run
+        working-directory: ./backend
+
+      - name: Run tests
+        run: npm test
+        working-directory: ./backend
