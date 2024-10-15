@@ -85,6 +85,9 @@ describe("getPersonsData - Positive Tests", () => {
 });
 
 describe("getPersonsData - Negative Tests", () => {
+  afterEach(() => {
+    jest.restoreAllMocks(); // Gendanner alle mocks for at frigive ressourcer
+  });
   test.each([
     [
       "should throw an error if the file does not exist",
@@ -125,7 +128,8 @@ describe("getPersonsData - Negative Tests", () => {
 });
 
 describe("getRandomPerson - Positive Tests", () => {
-  test("should return a random person with firstName, lastName" , () => {
+  test("should return a random person with firstName, lastName and gender" , () => {
+
   let person = getRandomPerson();
 
   expect(person).toHaveProperty("firstName");
@@ -145,46 +149,41 @@ describe("getRandomPerson - Positive Tests", () => {
 });
 
 describe("getRandomPerson - Negative Tests", () => {
-  let getPersonsData, getRandomPerson;
-
-  beforeEach(async () => {
-    // const module = await import("../src/fakeInfoFunctions");
-
-    // getPersonsData = module.getPersonsData;
-    // getRandomPerson = module.getRandomPerson;
-
-    // Only mock getPersonsData, not getRandomPerson
-    getPersonsData = jest.fn(); // Mock the getPersonsData function
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.spyOn(fs, "readFileSync").mockClear();
   });
 
   afterEach(() => {
-    jest.clearAllMocks(); // Clear all mocks after each test
+    jest.restoreAllMocks();
   });
 
   test("should throw an error if getPersonsData returns undefined", () => {
-    getPersonsData.mockReturnValue(undefined);
-    expect(() => getRandomPerson()).toThrow("No persons found in the data file");
+    jest.spyOn(fs, "readFileSync").mockReturnValue(undefined);
+    expect(() => getRandomPerson()).toThrow("Error reading or parsing person-names.json");
   });
 
   test("should throw an error if the persons array is empty", () => {
-    getPersonsData.mockReturnValue({ persons: [] });
+    jest.spyOn(fs, "readFileSync").mockReturnValue(JSON.stringify({ persons: [] }));
     expect(() => getRandomPerson()).toThrow("No persons found in the data file");
   });
 
   test("should throw an error if persons is not an array", () => {
-    getPersonsData.mockReturnValue({ persons: null });
+    jest.spyOn(fs, "readFileSync").mockReturnValue(JSON.stringify({ persons: null }));
     expect(() => getRandomPerson()).toThrow("No persons found in the data file");
   });
 
   test("should throw an error if a person is missing firstName or lastName", () => {
-    getPersonsData.mockReturnValue({
-      persons: [{ lastName: "Doe", gender: "Male" }], // Missing firstName
-    });
-    expect(() => getRandomPerson()).toThrow("No persons found in the data file");
+    jest.spyOn(fs, "readFileSync").mockReturnValue(
+        JSON.stringify({
+          persons: [{ lastName: "Doe", gender: "Male" }], // Mangler firstName
+        })
+    );
+    expect(() => getRandomPerson()).toThrow("Invalid person data");
   });
 
   test("should throw an error if getPersonsData returns null", () => {
-    getPersonsData.mockReturnValue(null);
+    jest.spyOn(fs, "readFileSync").mockReturnValue(null);
     expect(() => getRandomPerson()).toThrow("No persons found in the data file");
   });
 });
@@ -342,6 +341,7 @@ describe("getRandomPersonWithCPR - Positive Tests", () => {
     expect(person).toHaveProperty("cpr");
     expect(person.cpr).not.toBeNull();
     expect(person.cpr).not.toBeUndefined();
+  });
 });
 
 describe("getRandomPersonWithCPR - Negative Tests", () => {
@@ -457,8 +457,6 @@ describe("getRandomPhoneNumber - Positive Tests", () => {
   });
 });
 
-
-
 //Negative tests for randomPhoneNumber
 describe("getRandomPhoneNumber - Negative Tests", () => {
   // Table-driven tests for phone number length, character checks, and prefix validation
@@ -499,11 +497,11 @@ describe("getRandomPhoneNumber - Negative Tests", () => {
   assertion(phoneNumber);
 });
 });
-});
+
 
 describe("getRandomAddress - Positive Tests", () => {
   test("should return a random address with random street, number, floor, and door", async () => {
-    const result = await getRandomAddress(); 
+    const result = await getRandomAddress();
 
     ['street', 'number', 'floor', 'door', 'postal_code', 'town_name'].forEach(prop => {
       expect(result).toHaveProperty(prop);
@@ -523,7 +521,7 @@ describe("getRandomAddress - Positive Tests", () => {
   // });
 
   // test('should return a random address with random street, number, floor, and door', async () => {
-  //   const result = await getRandomAddress(); 
+  //   const result = await getRandomAddress();
 
   //   ['street', 'number', 'floor', 'door', 'postal_code', 'town_name'].forEach(prop => expect(result).toHaveProperty(prop));
   // });
