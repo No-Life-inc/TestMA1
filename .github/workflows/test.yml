@@ -9,7 +9,7 @@ env:
   DB_USER: root
   DB_NAME: ${{ secrets.DB_NAME }}
   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-  DB_HOST: 127.0.0.1
+  DB_HOST: localhost
 
 jobs:
   test:
@@ -44,6 +44,12 @@ jobs:
         run: npm install
         working-directory: ./backend
 
+      - name: Wait for MySQL to be ready
+        run: |
+          until mysqladmin ping -h "127.0.0.1" --silent; do
+            echo 'waiting for mysql to be ready...'
+            sleep 5
+          done
 
       - name: Run migrations
         run: npx knex migrate:latest
