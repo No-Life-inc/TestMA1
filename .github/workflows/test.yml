@@ -6,13 +6,9 @@ on:
       - development
       - workflow
 
-
-
 jobs:
   test:
     runs-on: ubuntu-latest
-
-
 
     services:
       mysql:
@@ -55,27 +51,27 @@ jobs:
 
       - name: Run migrations
         working-directory: ./backend/db
-        run: npx knex migrate:latest
         env:
           DB_USER: ${{ secrets.DB_USER }}
           DB_NAME: ${{ secrets.DB_NAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_HOST: localhost
+        run: npx knex migrate:latest
 
       - name: Run seeds
         working-directory: ./backend/db
-        run: npx knex seed:run
         env:
           DB_USER: ${{ secrets.DB_USER }}
           DB_NAME: ${{ secrets.DB_NAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_HOST: localhost
+        run: npx knex seed:run
 
       - name: Run tests
         working-directory: ./backend
-        run: npm test
         env:
           DB_USER: ${{ secrets.DB_USER }}
           DB_NAME: ${{ secrets.DB_NAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_HOST: mysql
+          DB_HOST: localhost
+        run: npm test
