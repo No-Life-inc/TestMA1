@@ -53,11 +53,11 @@ jobs:
 
       - name: Run migrations
         run: npx knex migrate:latest
-        working-directory: ./backend
+        working-directory: ./backend/db
 
       - name: Run seeds
         run: npx knex seed:run
-        working-directory: ./backend
+        working-directory: ./backend/db
 
       - name: Run tests
         run: npm test
