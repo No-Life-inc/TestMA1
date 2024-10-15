@@ -1,6 +1,6 @@
 import fs from "fs";
 import db from "../db/db.js";
-import { jest } from "@jest/globals";
+import { expect, jest, test } from "@jest/globals";
 import {
   getRandomCPR,
   getBirthDateFromCPR,
@@ -190,85 +190,26 @@ describe("getRandomPerson - Negative Tests", () => {
 });
 
 describe("getRandomPersonWithBirthdate - Positive Tests", () => {
-  let getPersonsData, getRandomPerson, getRandomCPR, getBirthDateFromCPR, formatDate;
+  test("should return a random person with a birthdate", () => {
+  let person = getRandomPersonWithBirthdate();
 
-  beforeEach(async () => {
-    // Dynamic import of the module and get the functions
-    const module = await import("../src/fakeInfoFunctions");
+  expect(person).toHaveProperty("firstName");
+  expect(person.firstName).not.toBeNull();
+  expect(person.firstName).not.toBeUndefined();
 
-    getPersonsData = module.getPersonsData;
-    getRandomPerson = module.getRandomPerson;
-    getRandomCPR = module.getRandomCPR;
-    getBirthDateFromCPR = module.getBirthDateFromCPR;
-    formatDate = module.formatDate;
+  expect(person).toHaveProperty("lastName");
+  expect(person.lastName).not.toBeNull();
+  expect(person.lastName).not.toBeUndefined();
 
-    // Make sure to mock the functions for each test case
-    getPersonsData = jest.fn(() => ({
-      persons: [{ firstName: "John", lastName: "Doe", gender: "Male" }],
-    }));
+  expect(person).toHaveProperty("gender");
+  expect(person.gender).not.toBeNull();
+  expect(person.gender).not.toBeUndefined();
 
-    getRandomPerson = jest.fn(() => ({
-      firstName: "John",
-      lastName: "Doe",
-      gender: "Male",
-    }));
-
-    getRandomCPR = jest.fn(() => "0101011234");
-    getBirthDateFromCPR = jest.fn(() => new Date(2001, 0, 1));
-    formatDate = jest.fn((date) => date.toISOString().split("T")[0]);
+  expect(person).toHaveProperty("birthDate");
+  expect(person.birthDate).not.toBeNull();
+  expect(person.birthDate).not.toBeUndefined();
   });
 
-  afterEach(() => {
-    jest.clearAllMocks(); // Clear all mocks after each test
-  });
-
-  test.each([
-    [
-      "should return a valid person with male CPR and birthdate",
-      {
-        persons: [
-          { firstName: "John", lastName: "Doe", gender: "Male" },
-        ],
-      },
-      "0101011234", // Mock CPR
-      new Date(2001, 0, 1), // Mock birthdate
-      "2001-01-01", // Mock formatted birthdate
-    ],
-    [
-      "should return a valid person with female CPR and birthdate",
-      {
-        persons: [
-          { firstName: "Jane", lastName: "Doe", gender: "Female" },
-        ],
-      },
-      "0202022468", // Mock CPR for woman
-      new Date(2002, 1, 2), // Mock birthdate
-      "2002-02-02", // Mock formatted birthdate
-    ],
-  ])(
-      "%s",
-      (testDescription, mockPersonsData, mockCPR, mockBirthDate, mockFormattedDate) => {
-        // Mock return values for functions in each test case
-        getPersonsData.mockReturnValue(mockPersonsData);
-        getRandomCPR.mockReturnValue(mockCPR);
-        getBirthDateFromCPR.mockReturnValue(mockBirthDate);
-        formatDate.mockReturnValue(mockFormattedDate);
-
-        // Call getRandomPersonWithBirthdate (depended on the mocked functions)
-        const randomPersonWithBirthdate = {
-          firstName: mockPersonsData.persons[0].firstName,
-          lastName: mockPersonsData.persons[0].lastName,
-          gender: mockPersonsData.persons[0].gender,
-          birthDate: mockFormattedDate,
-        };
-
-        // Assertions
-        expect(randomPersonWithBirthdate.firstName).toBe(mockPersonsData.persons[0].firstName);
-        expect(randomPersonWithBirthdate.lastName).toBe(mockPersonsData.persons[0].lastName);
-        expect(randomPersonWithBirthdate.gender).toBe(mockPersonsData.persons[0].gender);
-        expect(randomPersonWithBirthdate.birthDate).toBe(mockFormattedDate);
-      }
-  );
 });
 
 describe("getRandomPersonWithBirthdate - Negative Tests", () => {
@@ -383,77 +324,26 @@ describe("getRandomPersonWithBirthdate - Negative Tests", () => {
 });
 
 describe("getRandomPersonWithCPR - Positive Tests", () => {
-  let getPersonsData, getRandomPerson, getRandomCPR;
+  test("should return a random person with a CPR number", () => {
+    let person = getRandomPersonWithCPR();
 
-  beforeEach(async () => {
-    const module = await import("../src/fakeInfoFunctions");
+    expect(person).toHaveProperty("firstName");
+    expect(person.firstName).not.toBeNull();
+    expect(person.firstName).not.toBeUndefined();
 
-    // import the functions
-    getPersonsData = module.getPersonsData;
-    getRandomPerson = module.getRandomPerson;
-    getRandomCPR = module.getRandomCPR;
+    expect(person).toHaveProperty("lastName");
+    expect(person.lastName).not.toBeNull();
+    expect(person.lastName).not.toBeUndefined();
 
-    // Mock the functions for each test case
-    getPersonsData = jest.fn(() => ({
-      persons: [{ firstName: "John", lastName: "Doe", gender: "Male" }],
-    }));
+    expect(person).toHaveProperty("gender");
+    expect(person.gender).not.toBeNull();
+    expect(person.gender).not.toBeUndefined();
 
-    getRandomPerson = jest.fn(() => ({
-      firstName: "John",
-      lastName: "Doe",
-      gender: "Male",
-    }));
-
-    getRandomCPR = jest.fn(() => "0101011235"); // CPR ending with odd number (for male)
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
-  test.each([
-    [
-      "should return a valid person with male CPR",
-      {
-        persons: [{ firstName: "John", lastName: "Doe", gender: "Male" }],
-      },
-      "0101011235", // CPR for male (last digit is odd)
-    ],
-    [
-      "should return a valid person with female CPR",
-      {
-        persons: [{ firstName: "Jane", lastName: "Doe", gender: "Female" }],
-      },
-      "0202022468", // CPR for female (last digit is even)
-    ],
-  ])("%s", (testDescription, mockPersonsData, mockCPR) => {
-    // Mock return values for each test case
-    getPersonsData.mockReturnValue(mockPersonsData);
-    getRandomCPR.mockReturnValue(mockCPR);
-
-    // Test the function
-    const result = {
-      firstName: mockPersonsData.persons[0]?.firstName,
-      lastName: mockPersonsData.persons[0]?.lastName,
-      gender: mockPersonsData.persons[0]?.gender,
-      cpr: mockCPR,
-    };
-
-    // expected result
-    expect(result.firstName).toBe(mockPersonsData.persons[0].firstName);
-    expect(result.lastName).toBe(mockPersonsData.persons[0].lastName);
-    expect(result.gender).toBe(mockPersonsData.persons[0].gender);
-    expect(result.cpr).toBe(mockCPR);
-
-    // Validate the last digit of the CPR
-    const lastDigit = parseInt(mockCPR.slice(-1), 10);
-    if (result.gender === "Male") {
-      expect(lastDigit % 2).toBe(1); // uneven last digit
-    } else {
-      expect(lastDigit % 2).toBe(0); // even last digit
-    }
-  });
+    expect(person).toHaveProperty("cpr");
+    expect(person.cpr).not.toBeNull();
+    expect(person.cpr).not.toBeUndefined();
 });
+
 describe("getRandomPersonWithCPR - Negative Tests", () => {
   let getPersonsData, getRandomPerson, getRandomCPR;
 
@@ -554,44 +444,19 @@ describe("getRandomPersonWithCPR - Negative Tests", () => {
 
 //Positive tests for getRandomPhoneNumber
 describe("getRandomPhoneNumber - Positive Tests", () => {
-  test.each([
-    [
-      "should return a valid phone number with 8 digits",
-      (phone) => expect(phone).toMatch(/^\d{8}$/),
-    ],
-    [
-      "should return a phone number that starts with a valid prefix",
-      (phone) => {
-        const matchingPrefix = phonePrefixes.find((prefix) =>
-          phone.startsWith(prefix)
-        );
-        expect(matchingPrefix).toBeDefined();
-      },
-    ],
-  ])("%s", (testDescription, assertion) => {
-    const phoneNumber = getRandomPhoneNumber();
-    assertion(phoneNumber);
+  test("should return a valid phone number with 8 digits", () => {
+    const phone = getRandomPhoneNumber();
+    expect(phone).toMatch(/^\d{8}$/);
+
+    const matchingPrefix = phonePrefixes.find((prefix) =>
+      phone.startsWith(prefix)
+    );
+
+    expect(matchingPrefix).toBeDefined();
+
   });
 });
 
-describe("getRandomAddress - Positive Tests", () => {
-
-  beforeEach(async () => {
-    // Make sure the database connection is established before running the tests
-    await db.raw('SELECT 1'); // Simple query to check if the connection is working
-  });
-
-  afterAll(async () => {
-    // Close the database connection after all tests have run
-    await db.destroy();
-  });
-
-  test('should return a random address with random street, number, floor, and door', async () => {
-    const result = await getRandomAddress(); 
-
-    ['street', 'number', 'floor', 'door', 'postal_code', 'town_name'].forEach(prop => expect(result).toHaveProperty(prop));
-  });
-});
 
 
 //Negative tests for randomPhoneNumber
@@ -615,22 +480,51 @@ describe("getRandomPhoneNumber - Negative Tests", () => {
       (phone) => {
         const matchingPrefix = phonePrefixes.find((prefix) =>
           phone.startsWith(prefix)
-        );
-        expect(matchingPrefix).toBeDefined();
-      },
-    ],
-    [
-      "should not return a phone number with an invalid prefix length",
-      (phone) => {
-        const prefixLength = phonePrefixes.find((prefix) =>
-          phone.startsWith(prefix)
-        )?.length;
-        const remainingDigits = 8 - (prefixLength || 0);
-        expect(remainingDigits).toBeGreaterThanOrEqual(0);
-      },
-    ],
-  ])("%s", (testDescription, assertion) => {
-    const phoneNumber = getRandomPhoneNumber();
-    assertion(phoneNumber);
+      );
+      expect(matchingPrefix).toBeDefined();
+    },
+  ],
+  [
+    "should not return a phone number with an invalid prefix length",
+    (phone) => {
+      const prefixLength = phonePrefixes.find((prefix) =>
+        phone.startsWith(prefix)
+    )?.length;
+    const remainingDigits = 8 - (prefixLength || 0);
+    expect(remainingDigits).toBeGreaterThanOrEqual(0);
+  },
+],
+])("%s", (testDescription, assertion) => {
+  const phoneNumber = getRandomPhoneNumber();
+  assertion(phoneNumber);
+});
+});
+});
+
+describe("getRandomAddress - Positive Tests", () => {
+  test("should return a random address with random street, number, floor, and door", async () => {
+    const result = await getRandomAddress(); 
+
+    ['street', 'number', 'floor', 'door', 'postal_code', 'town_name'].forEach(prop => {
+      expect(result).toHaveProperty(prop);
+      expect(result[prop]).not.toBeNull();
+      expect(result[prop]).not.toBeUndefined();
+    });
   });
+
+  // beforeEach(async () => {
+  //   // Make sure the database connection is established before running the tests
+  //   await db.raw('SELECT 1'); // Simple query to check if the connection is working
+  // });
+
+  // afterAll(async () => {
+  //   // Close the database connection after all tests have run
+  //   await db.destroy();
+  // });
+
+  // test('should return a random address with random street, number, floor, and door', async () => {
+  //   const result = await getRandomAddress(); 
+
+  //   ['street', 'number', 'floor', 'door', 'postal_code', 'town_name'].forEach(prop => expect(result).toHaveProperty(prop));
+  // });
 });
