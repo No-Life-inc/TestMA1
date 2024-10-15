@@ -44,8 +44,8 @@ Open a new terminal in the db folder. <br>
 Lastly, use the following command:
 
 ```bash
-run npx knex migrate:latest
-run npx seed:run
+npx knex migrate:latest
+npx knex seed:run
 ```
 ## API Endpoints
 
