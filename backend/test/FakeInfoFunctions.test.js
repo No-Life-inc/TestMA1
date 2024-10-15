@@ -12,9 +12,9 @@ import {
   getPersonsData,
   getRandomPhoneNumber,
 } from "../src/fakeInfoFunctions";
-import { phonePrefixes } from "../data/phoneData.js";
+import { phonePrefixes } from "../data/phonePrefixData.js";
 
-describe.only("getRandomCPRPositiveTests", () => {
+describe("getRandomCPRPositiveTests", () => {
   test.each([
     [false, 0], // false for female, expect even last digit
     [true, 1], // true for male, expect odd last digit
@@ -72,29 +72,23 @@ describe("getBirthDateFromCPRNegativeTests", () => {
 });
 
 describe("getPersonsData - Positive Tests", () => {
-  test.each([
-    [
-      "should return parsed data when the file contains valid persons data",
-      JSON.stringify({ persons: [{ firstName: "John", lastName: "Doe" }] }),
-      1,
-      "John",
-    ],
-    [
-      "should return parsed data when the file contains exactly one person (boundary case)",
-      JSON.stringify({ persons: [{ firstName: "Solo", lastName: "One" }] }),
-      1,
-      "Solo",
-    ],
-  ])(
-    "%s",
-    (testDescription, mockFileData, expectedLength, expectedFirstName) => {
-      jest.spyOn(fs, "readFileSync").mockReturnValue(mockFileData);
-      const data = getPersonsData();
+  test("should return data with firstName, lastName, and gender attributes", () => {
+    const data = getPersonsData();
 
-      expect(data.persons).toHaveLength(expectedLength);
-      expect(data.persons[0].firstName).toBe(expectedFirstName);
-    }
-  );
+    data.persons.forEach(person => {
+      expect(person).toHaveProperty("firstName");
+      expect(person.firstName).not.toBeNull();
+      expect(person.firstName).not.toBeUndefined();
+
+      expect(person).toHaveProperty("lastName");
+      expect(person.lastName).not.toBeNull();
+      expect(person.lastName).not.toBeUndefined();
+
+      expect(person).toHaveProperty("gender");
+      expect(person.gender).not.toBeNull();
+      expect(person.gender).not.toBeUndefined();
+    });
+  });
 });
 
 describe("getPersonsData - Negative Tests", () => {

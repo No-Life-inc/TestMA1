@@ -70,7 +70,7 @@ const getBirthDateFromCPR = (cpr) => {
 //Bruges til at indlæse json filen
 const getPersonsData = () => {
   try {
-    const filePath = path.resolve("data", "person-names.json");
+    const filePath = path.resolve(__dirname, "../data/person-names.json");
     const data = fs.readFileSync(filePath, "utf-8");
 
     const parsedData = JSON.parse(data);
