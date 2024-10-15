@@ -14,10 +14,10 @@ const config = {
     database: process.env.DB_NAME,
   },
   migrations: {
-    directory: ".migrations",
+    directory: "./backend/db/.migrations",
   },
   seeds: {
-    directory: ".seeds",
+    directory: "./backend/db/.seeds",
   },
 };
 

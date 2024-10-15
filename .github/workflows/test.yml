@@ -30,6 +30,12 @@ jobs:
         node-version: [18.x]
 
     steps:
+      - name: Debug environment variables
+        run: |
+          echo "DB_HOST is $DB_HOST"
+          echo "DB_USER is $DB_USER"
+          echo "DB_NAME is $DB_NAME"
+
       - name: Checkout repository
         uses: actions/checkout@v2
 
