@@ -525,7 +525,8 @@ describe("getRandomAddress - Positive Tests", () => {
 
 describe("getRandomPersonFullInfo - Positive Tests", () => {
   test("should return a random person with full information", async () => {
-    const result = await getRandomPersonFullInfo();
+        db.initialize();
+        const result = await getRandomPersonFullInfo();
 
     ['firstName', 'lastName', 'gender', 'birthDate', 'cpr', 'address', 'phoneNumber'].forEach(prop => {
       expect(result).toHaveProperty(prop);
@@ -539,13 +540,14 @@ describe("getRandomPersonFullInfo - Positive Tests", () => {
       expect(result.address[prop]).not.toBeNull();
       expect(result.address[prop]).not.toBeUndefined();
     });
-  }
-  );
+    db.destroy();
+  });
 }
 );
 
 describe("getRandomPersonsBulk - Positive Tests", () => {
   test('should return an array of random persons with full information', async () => {
+    db.initialize();
     const count = 5;
     const result = await getRandomPersonsBulk(count);
 
@@ -569,6 +571,7 @@ describe("getRandomPersonsBulk - Positive Tests", () => {
         expect(person.address[prop]).not.toBeNull();
         expect(person.address[prop]).not.toBeUndefined();
     });
-});
+    db.destroy();
+  });
 }
 );

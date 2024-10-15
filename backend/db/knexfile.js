@@ -3,9 +3,9 @@ import pkg from "knex";
 const { Knex } = pkg;
 
 // Load environment variables from a .env file
-if (!process.env.GITHUB_ACTIONS) {
-  dotenv.config({ path: "../../.env" });
-}
+
+dotenv.config({ path: "../../.env" });
+
 
 const config = {
   client: "mysql2",
