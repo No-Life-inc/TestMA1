@@ -10,7 +10,7 @@ env:
   DB_USER: ${{ secrets.DB_USER }}
   DB_NAME: ${{ secrets.DB_NAME }}
   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-  DB_HOST: 127.0.0.1  # Brug 127.0.0.1 frem for localhost for mere stabil forbindelse
+  DB_HOST: localhost
 
 jobs:
   test:
@@ -22,7 +22,7 @@ jobs:
         ports:
           - 3306:3306
         env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}  # Brug secrets direkte her
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
           MYSQL_DATABASE: ${{ secrets.DB_NAME }}
 
     strategy:
