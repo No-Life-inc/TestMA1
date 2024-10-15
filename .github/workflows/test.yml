@@ -6,7 +6,7 @@ on:
       - development
 
 env:
-  DB_USER: root
+  DB_USER: ${{ secrets.DB_USER }}
   DB_NAME: ${{ secrets.DB_NAME }}
   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
   DB_HOST: localhost
@@ -50,13 +50,13 @@ jobs:
           done
 
       - name: Run migrations
-        run: npx knex migrate:latest
         working-directory: ./backend/db
         env: 
           DB_USER: ${{ env.DB_USER }}
           DB_NAME: ${{ env.DB_NAME }}
           DB_PASSWORD: ${{ env.DB_PASSWORD }}
           DB_HOST: ${{ env.DB_HOST }}
+        run: npx knex migrate:latest
 
       - name: Run seeds
         run: npx knex seed:run
