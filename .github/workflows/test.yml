@@ -9,7 +9,7 @@ env:
   DB_USER: root
   DB_NAME: ${{ secrets.DB_NAME }}
   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-  DB_HOST: localhost
+  DB_HOST: 127.0.0.1
 
 jobs:
   test:
@@ -21,8 +21,10 @@ jobs:
         ports:
           - 3306:3306
         env:
-          MYSQL_ROOT_PASSWORD: $DB_PASSWORD 
-          MYSQL_DATABASE: $DB_NAME
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }} # Træk direkte fra secrets
+          MYSQL_DATABASE: ${{ secrets.DB_NAME }}
+          MYSQL_USER: root
+          MYSQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
       
 
     strategy:
@@ -52,26 +54,11 @@ jobs:
       - name: Run migrations
         run: npx knex migrate:latest
         working-directory: ./backend/db
-        env: 
-          DB_USER: ${{ env.DB_USER }}
-          DB_NAME: ${{ env.DB_NAME }}
-          DB_PASSWORD: ${{ env.DB_PASSWORD }}
-          DB_HOST: ${{ env.DB_HOST }}
 
       - name: Run seeds
         run: npx knex seed:run
         working-directory: ./backend/db
-        env: 
-          DB_USER: ${{ env.DB_USER }}
-          DB_NAME: ${{ env.DB_NAME }}
-          DB_PASSWORD: ${{ env.DB_PASSWORD }}
-          DB_HOST: ${{ env.DB_HOST }}
 
       - name: Run tests
         run: npm test
         working-directory: ./backend
-        env: 
-          DB_USER: ${{ env.DB_USER }}
-          DB_NAME: ${{ env.DB_NAME }}
-          DB_PASSWORD: ${{ env.DB_PASSWORD }}
-          DB_HOST: ${{ env.DB_HOST }}
