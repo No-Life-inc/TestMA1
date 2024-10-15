@@ -1,8 +1,9 @@
 import knex from "knex";
 import dotenv from "dotenv";
 
-dotenv.config();
-
+if (!process.env.GITHUB_ACTIONS) {
+    dotenv.config({ });
+}
 const db = knex({
     client: 'mysql2',
     connection: {
