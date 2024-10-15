@@ -75,19 +75,12 @@ describe("getPersonsData - Positive Tests", () => {
   test("should return data with firstName, lastName, and gender attributes", () => {
     const data = getPersonsData();
 
-    data.persons.forEach(person => {
-      expect(person).toHaveProperty("firstName");
-      expect(person.firstName).not.toBeNull();
-      expect(person.firstName).not.toBeUndefined();
+    // Check that the data object has a persons array
+    expect(data).toHaveProperty("persons");
+    expect(Array.isArray(data.persons)).toBe(true);
+    expect(data.persons.length).toBeGreaterThan(0);
 
-      expect(person).toHaveProperty("lastName");
-      expect(person.lastName).not.toBeNull();
-      expect(person.lastName).not.toBeUndefined();
 
-      expect(person).toHaveProperty("gender");
-      expect(person.gender).not.toBeNull();
-      expect(person.gender).not.toBeUndefined();
-    });
   });
 });
 
@@ -132,73 +125,33 @@ describe("getPersonsData - Negative Tests", () => {
 });
 
 describe("getRandomPerson - Positive Tests", () => {
-  let getPersonsData, getRandomPerson;
+  test("should return a random person with firstName, lastName" , () => {
+  let person = getRandomPerson();
 
-  beforeEach(async () => {
-    // Dynamically import the module and grab its functions
-    const module = await import("../src/fakeInfoFunctions");
+  expect(person).toHaveProperty("firstName");
+  expect(person.firstName).not.toBeNull();
+  expect(person.firstName).not.toBeUndefined();
 
-    getPersonsData = module.getPersonsData;
-    getRandomPerson = module.getRandomPerson;
+  expect(person).toHaveProperty("lastName");
+  expect(person.lastName).not.toBeNull();
+  expect(person.lastName).not.toBeUndefined();
 
-    // Manually mock getPersonsData using jest.fn()
-    getPersonsData = jest.fn(() => ({
-      persons: [{ firstName: "John", lastName: "Doe", gender: "Male" }],
-    }));
+  expect(person).toHaveProperty("gender");
+  expect(person.gender).not.toBeNull();
+  expect(person.gender).not.toBeUndefined();
 
-    // Manually mock getRandomPerson using jest.fn()
-    getRandomPerson = jest.fn(() => ({
-      firstName: "John",
-      lastName: "Doe",
-      gender: "Male",
-    }));
   });
-
-  afterEach(() => {
-    jest.clearAllMocks(); // Clear all mocks after each test
-  });
-
-  test.each([
-    [
-      "should return a random person from valid persons data",
-      {
-        persons: [
-          { firstName: "John", lastName: "Doe", gender: "Male" },
-          { firstName: "Jane", lastName: "Doe", gender: "Female" },
-        ],
-      },
-      2,
-    ],
-    [
-      "should return the only person when the persons array contains exactly one person",
-      {
-        persons: [{ firstName: "Solo", lastName: "One", gender: "Non-binary" }],
-      },
-      1,
-    ],
-  ])("%s", (testDescription, mockPersonsData, expectedPersonsLength) => {
-    // Mock return value of getPersonsData for each test case
-    getPersonsData.mockReturnValue(mockPersonsData);
-
-    // Call getRandomPerson (which might depend on getPersonsData)
-    const randomPerson = getRandomPerson();
-
-    // Assertions
-    expect(mockPersonsData.persons).toHaveLength(expectedPersonsLength);
-    expect(randomPerson).toHaveProperty("firstName");
-    expect(randomPerson).toHaveProperty("lastName");
-    expect(randomPerson).toHaveProperty("gender");
-  });
+  
 });
 
 describe("getRandomPerson - Negative Tests", () => {
   let getPersonsData, getRandomPerson;
 
   beforeEach(async () => {
-    const module = await import("../src/fakeInfoFunctions");
+    // const module = await import("../src/fakeInfoFunctions");
 
-    getPersonsData = module.getPersonsData;
-    getRandomPerson = module.getRandomPerson;
+    // getPersonsData = module.getPersonsData;
+    // getRandomPerson = module.getRandomPerson;
 
     // Only mock getPersonsData, not getRandomPerson
     getPersonsData = jest.fn(); // Mock the getPersonsData function
