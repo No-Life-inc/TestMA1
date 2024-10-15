@@ -6,10 +6,10 @@ on:
       - development
 
 env:
-  DB_USER: ${{ secrets.DB_USER }}
+  DB_USER: root
   DB_NAME: ${{ secrets.DB_NAME }}
   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-  DB_HOST: 172.18.0.1
+  DB_HOST: localhost
 
 jobs:
   test:
@@ -22,9 +22,7 @@ jobs:
           - 3306:3306
         env:
           MYSQL_ROOT_PASSWORD: $DB_PASSWORD 
-          MYSQL_DATABASE: $DB_NAME
-          MYSQL_USER: $DB_USER
-          MYSQL_PASSWORD: $DB_PASSWORD        
+          MYSQL_DATABASE: $DB_NAME      
 
     strategy:
       matrix:
