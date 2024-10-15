@@ -6,11 +6,6 @@ on:
       - development
       - workflow
 
-env:
-  DB_USER: ${{ secrets.DB_USER }}
-  DB_NAME: ${{ secrets.DB_NAME }}
-  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-  DB_HOST: localhost
 
 jobs:
   test:
@@ -24,6 +19,8 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
           MYSQL_DATABASE: ${{ secrets.DB_NAME }}
+          MYSQL_USER: ${{ secrets.DB_USER }}
+          MYSQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
     strategy:
       matrix:
@@ -56,6 +53,11 @@ jobs:
       - name: Run migrations
         working-directory: ./backend/db
         run: npx knex migrate:latest
+        env:
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_HOST: localhost
 
       - name: Run seeds
         working-directory: ./backend/db
