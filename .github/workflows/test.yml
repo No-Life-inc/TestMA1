@@ -12,11 +12,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    env:
-      DB_USER: ${{ secrets.DB_USER }}
-      DB_NAME: ${{ secrets.DB_NAME }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      DB_HOST: localhost
+
 
     services:
       mysql:
@@ -24,10 +20,10 @@ jobs:
         ports:
           - 3306:3306
         env:
-          MYSQL_ROOT_PASSWORD: $DB_PASSWORD
-          MYSQL_DATABASE: $DB_NAME
-          MYSQL_USER: $DB_USER
-          MYSQL_PASSWORD: $DB_PASSWORD
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.DB_NAME }}
+          MYSQL_USER: ${{ secrets.DB_USER }}
+          MYSQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
     strategy:
       matrix:
@@ -61,25 +57,25 @@ jobs:
         working-directory: ./backend/db
         run: npx knex migrate:latest
         env:
-          MYSQL_ROOT_PASSWORD: $DB_PASSWORD
-          MYSQL_DATABASE: $DB_NAME
-          MYSQL_USER: $DB_USER
-          MYSQL_PASSWORD: $DB_PASSWORD
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_HOST: localhost
 
       - name: Run seeds
         working-directory: ./backend/db
         run: npx knex seed:run
         env:
-          MYSQL_ROOT_PASSWORD: $DB_PASSWORD
-          MYSQL_DATABASE: $DB_NAME
-          MYSQL_USER: $DB_USER
-          MYSQL_PASSWORD: $DB_PASSWORD
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_HOST: localhost
 
       - name: Run tests
         working-directory: ./backend
         run: npm test
         env:
-          MYSQL_ROOT_PASSWORD: $DB_PASSWORD
-          MYSQL_DATABASE: $DB_NAME
-          MYSQL_USER: $DB_USER
-          MYSQL_PASSWORD: $DB_PASSWORD
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_HOST: localhost
