@@ -9,6 +9,9 @@ import {
   getRandomDoor,
 } from "./helperFunctions.js";
 import { phonePrefixes } from "../data/phonePrefixData.js";
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // make a CPR number function
 const getRandomCPR = (gender) => {
@@ -67,12 +70,11 @@ const getBirthDateFromCPR = (cpr) => {
   return new Date(fullYear, month - 1, day);
 };
 
-//Bruges til at indlæse json filen
+//Use to get the persons data from the json file
 const getPersonsData = () => {
   try {
     const filePath = path.resolve(__dirname, "../data/person-names.json");
     const data = fs.readFileSync(filePath, "utf-8");
-
     const parsedData = JSON.parse(data);
 
     // Handle specific case where persons array is missing or empty
@@ -87,7 +89,7 @@ const getPersonsData = () => {
     return parsedData;
   } catch (error) {
     // If the error message is specific to persons array, do not overwrite it
-    if (error.message === "No persons found in the data file") {
+    if (error.message.includes("No persons found")) {
       throw error;
     }
     throw new Error("Error reading or parsing person-names.json");
