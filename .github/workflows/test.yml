@@ -21,9 +21,9 @@ jobs:
         ports:
           - 3306:3306
         env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }} # Træk direkte fra secrets
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
           MYSQL_DATABASE: ${{ secrets.DB_NAME }}
-          MYSQL_USER: root
+          MYSQL_USER: ${{ secrets.DB_USER }}
           MYSQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
       
 
