@@ -6,10 +6,10 @@ on:
       - development
 
 env:
-  DB_USER: ${{ secrets.DB_USER }}
+  DB_USER: root
   DB_NAME: ${{ secrets.DB_NAME }}
   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-  DB_HOST: localhost
+  DB_HOST: 127.0.0.1
 
 jobs:
   test:
@@ -21,8 +21,10 @@ jobs:
         ports:
           - 3306:3306
         env:
-          MYSQL_ROOT_PASSWORD: $DB_PASSWORD
-          MYSQL_DATABASE: $DB_NAME
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }} # Træk direkte fra secrets
+          MYSQL_DATABASE: ${{ secrets.DB_NAME }}
+          MYSQL_USER: root
+          MYSQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
     strategy:
       matrix:
