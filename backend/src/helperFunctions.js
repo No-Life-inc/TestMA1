@@ -1,35 +1,35 @@
-//Hjælper funktion til konvertering af Date objektet til en string
+//Helper functions to generate random data for the database
 const formatDate = (date) => {
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0"); // `getMonth()` er 0-baseret
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // `getMonth()` is zero-based
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
 
-// Hjælper funktion til at generere et tilfældigt gadenavn
+// Helper function to generate a random street name
 const getRandomStreet = () => {
-  const streetLength = Math.floor(Math.random() * 10) + 5; // Længde på gadenavn
-  return getRandomText(streetLength); // Genér tilfældigt navn
+  const streetLength = Math.floor(Math.random() * 10) + 5; // Length between 5 and 14 characters
+  return getRandomText(streetLength); // generate random text
 };
 
-// Hjælper funktion til at generere et tilfældigt husnummer
+// Helper function to generate a random number
 const getRandomNumber = () => {
-  let number = Math.floor(Math.random() * 999) + 1; // Tal mellem 1 og 999
+  let number = Math.floor(Math.random() * 999) + 1; // number between 1 and 999
   if (Math.random() < 0.2) {
-    number += String.fromCharCode(65 + Math.floor(Math.random() * 26)); // Tilsæt tilfældigt bogstav (A-Z) 20% af gangene
+    number += String.fromCharCode(65 + Math.floor(Math.random() * 26)); // Add random letter (A-Z)
   }
   return number;
 };
 
-// Hjælper funktion til at generere en tilfældig etage
+// Helper function to generate a random floor
 const getRandomFloor = () => {
   if (Math.random() < 0.3) {
-    return "st"; // 30% sandsynlighed for stue
+    return "st"; // 30% chance for st (stuen)
   }
-  return Math.floor(Math.random() * 99) + 1; // Etage fra 1 til 99
+  return Math.floor(Math.random() * 99) + 1; // Floor number between 1 and 99
 };
 
-// Hjælper funktion til at generere en tilfældig dør
+// Helper function to generate a random door
 const getRandomDoor = () => {
   const doorType = Math.floor(Math.random() * 20) + 1;
   if (doorType < 8) {
@@ -39,7 +39,7 @@ const getRandomDoor = () => {
   } else if (doorType < 17) {
     return "mf";
   } else if (doorType < 19) {
-    return Math.floor(Math.random() * 50) + 1; // Dørnummer mellem 1 og 50
+    return Math.floor(Math.random() * 50) + 1; // number between 1 and 50
   } else {
     const lowerCaseLetters = "abcdefghijklmnopqrstuvwxyzøæå";
     let door =
@@ -47,12 +47,12 @@ const getRandomDoor = () => {
     if (Math.random() < 0.5) {
       door += "-";
     }
-    door += Math.floor(Math.random() * 999) + 1; // Bogstav plus tal (f.eks. c3 eller d-14)
+    door += Math.floor(Math.random() * 999) + 1; // letter + number like "a-123"
     return door;
   }
 };
 
-// Hjælper funktion til at generere en tilfældig tekst
+// Helper function to generate random text
 const getRandomText = (length = 1) => {
   const validCharacters =
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZæøåÆØÅ";

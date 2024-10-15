@@ -8,7 +8,7 @@ import {
   getRandomFloor,
   getRandomDoor,
 } from "./helperFunctions.js";
-import { phonePrefixes } from "../data/phoneData.js";
+import { phonePrefixes } from "../data/phonePrefixData.js";
 
 // make a CPR number function
 const getRandomCPR = (gender) => {
@@ -127,15 +127,15 @@ const getRandomPerson = () => {
   };
 };
 
-// Funktion der henter en tilfældig person fra json filen og tilføjer en birthdate
+// Function that returns a random person with a birthdate
 const getRandomPersonWithBirthdate = () => {
   const randomPerson = getRandomPerson();
 
   const genderAsBoolean = randomPerson.gender === "male";
 
-  const randomCPR = getRandomCPR(genderAsBoolean); //Laver et random cpr ud fra kønnet
+  const randomCPR = getRandomCPR(genderAsBoolean); //Creates a random cpr
 
-  const birthDate = getBirthDateFromCPR(randomCPR); //Laver en birthdate ud fra cpr
+  const birthDate = getBirthDateFromCPR(randomCPR); //Creates a birthdate from the cpr
 
   return {
     firstName: randomPerson.firstName,
@@ -145,7 +145,7 @@ const getRandomPersonWithBirthdate = () => {
   };
 };
 
-// Funktion der henter en tilfældig person fra json filen og tilføjer en cpr
+// Function that returns a random person with a cpr
 const getRandomPersonWithCPR = () => {
   const randomPerson = getRandomPerson();
 
@@ -160,7 +160,7 @@ const getRandomPersonWithCPR = () => {
   };
 };
 
-// Funktion der henter en tilfældig person fra json filen og tilføjer en cpr og birthdate
+// Function that returns a random person with a cpr and birthdate
 const getRandomPersonWithCPRandBirthdate = (
   randomPersonGenerator = getRandomPerson,
   randomCPRGenerator = getRandomCPR
@@ -180,7 +180,7 @@ const getRandomPersonWithCPRandBirthdate = (
   };
 };
 
-// Funktion til at hente en tilfældig adresse fra databasen
+// Function that returns a random address
 const getRandomAddress = async () => {
   try {
     const address = await db("address").orderByRaw("RAND()").first();
@@ -204,8 +204,11 @@ const getRandomAddress = async () => {
 };
 
 const getRandomPhoneNumber = () => {
+
+  const ALLOWEDPREFIX = phonePrefixes;
+
   const prefix =
-    phonePrefixes[Math.floor(Math.random() * phonePrefixes.length)];
+    ALLOWEDPREFIX[Math.floor(Math.random() * ALLOWEDPREFIX.length)];
   let phoneNumber = prefix;
   const remainingDigits = 8 - prefix.length;
 

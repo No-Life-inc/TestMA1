@@ -14,7 +14,7 @@ import {
 } from "../src/fakeInfoFunctions";
 import { phonePrefixes } from "../data/phoneData.js";
 
-describe("getRandomCPRPositiveTests", () => {
+describe.only("getRandomCPRPositiveTests", () => {
   test.each([
     [false, 0], // false for female, expect even last digit
     [true, 1], // true for male, expect odd last digit
@@ -529,7 +529,7 @@ describe("getRandomPersonWithCPR - Negative Tests", () => {
       gender: "Male",
     }));
 
-    getRandomCPR = jest.fn(() => "invalidCPR"); // Placeholder, ændres i hver test case
+    getRandomCPR = jest.fn(() => "invalidCPR"); 
   });
 
   afterEach(() => {
@@ -575,24 +575,24 @@ describe("getRandomPersonWithCPR - Negative Tests", () => {
     getRandomCPR.mockReturnValue(mockCPR);
 
     try {
-      // Test funktionen
+
       const result = {
         firstName: mockPersonsData.persons[0]?.firstName,
         lastName: mockPersonsData.persons[0]?.lastName,
         gender: mockPersonsData.persons[0]?.gender,
         cpr: mockCPR,
       };
-      // Hvis ingen personer er fundet, kast en fejl
+      // If no persons are found, throw an error
       if (!mockPersonsData.persons.length) {
         throw new Error("No persons found");
       }
 
-      // Valider CPR længde og format
+      // Validate the CPR format
       if (!mockCPR.match(/^\d{10}$/)) {
         throw new Error(expectedError);
       }
 
-      // Forventet resultat, hvis alt er korrekt
+      // Expected result
       expect(result).toEqual({
         firstName: mockPersonsData.persons[0].firstName,
         lastName: mockPersonsData.persons[0].lastName,
@@ -630,17 +630,17 @@ describe("getRandomPhoneNumber - Positive Tests", () => {
 describe("getRandomAddress - Positive Tests", () => {
 
   beforeEach(async () => {
-    // Sørg for at forbinde til databasen
-    await db.raw('SELECT 1'); // Simpel forespørgsel for at sikre, at forbindelsen er etableret
+    // Make sure the database connection is established before running the tests
+    await db.raw('SELECT 1'); // Simple query to check if the connection is working
   });
 
   afterAll(async () => {
-    // Luk databaseforbindelsen efter alle tests er færdige
+    // Close the database connection after all tests have run
     await db.destroy();
   });
 
   test('should return a random address with random street, number, floor, and door', async () => {
-    const result = await getRandomAddress(); // Kald din funktion
+    const result = await getRandomAddress(); 
 
     ['street', 'number', 'floor', 'door', 'postal_code', 'town_name'].forEach(prop => expect(result).toHaveProperty(prop));
   });
