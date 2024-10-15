@@ -500,9 +500,17 @@ describe("getRandomPhoneNumber - Negative Tests", () => {
 });
 });
 
+describe("getRandomAddress - Negative Tests", () => {
+  test("should throw an error if the database connection is not working", async () => {
+    db.destroy();
+    await expect(getRandomAddress()).rejects.toThrow("Failed to fetch random address");
+  });
+});
+
 
 describe("getRandomAddress - Positive Tests", () => {
   test("should return a random address with random street, number, floor, and door", async () => {
+    db.initialize();
     const result = await getRandomAddress();
 
     ['street', 'number', 'floor', 'door', 'postal_code', 'town_name'].forEach(prop => {
@@ -510,6 +518,7 @@ describe("getRandomAddress - Positive Tests", () => {
       expect(result[prop]).not.toBeNull();
       expect(result[prop]).not.toBeUndefined();
     });
+    db.destroy();
   });
 });
 
