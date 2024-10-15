@@ -55,7 +55,7 @@ jobs:
           DB_USER: ${{ secrets.DB_USER }}
           DB_NAME: ${{ secrets.DB_NAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_HOST: localhost
+          DB_HOST: mysql
         run: npx knex migrate:latest
 
       - name: Run seeds
@@ -64,7 +64,7 @@ jobs:
           DB_USER: ${{ secrets.DB_USER }}
           DB_NAME: ${{ secrets.DB_NAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_HOST: localhost
+          DB_HOST: mysql
         run: npx knex seed:run
 
       - name: Run tests
