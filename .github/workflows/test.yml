@@ -47,12 +47,6 @@ jobs:
             echo 'waiting for mysql to be ready...'
             sleep 5
           done
-        
-      - name: Check MySQL User
-        run: |
-          sudo apt-get install -y mysql-client
-          mysql -h 127.0.0.1 -u root -p${{ secrets.DB_PASSWORD }} -e "SELECT User, Host FROM mysql.user WHERE User='${{ secrets.DB_USER }}';"
-
 
       - name: Run migrations
         working-directory: ./backend/db
