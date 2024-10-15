@@ -60,11 +60,26 @@ jobs:
       - name: Run migrations
         working-directory: ./backend/db
         run: npx knex migrate:latest
+        env:
+          MYSQL_ROOT_PASSWORD: $DB_PASSWORD
+          MYSQL_DATABASE: $DB_NAME
+          MYSQL_USER: $DB_USER
+          MYSQL_PASSWORD: $DB_PASSWORD
 
       - name: Run seeds
         working-directory: ./backend/db
         run: npx knex seed:run
+        env:
+          MYSQL_ROOT_PASSWORD: $DB_PASSWORD
+          MYSQL_DATABASE: $DB_NAME
+          MYSQL_USER: $DB_USER
+          MYSQL_PASSWORD: $DB_PASSWORD
 
       - name: Run tests
         working-directory: ./backend
         run: npm test
+        env:
+          MYSQL_ROOT_PASSWORD: $DB_PASSWORD
+          MYSQL_DATABASE: $DB_NAME
+          MYSQL_USER: $DB_USER
+          MYSQL_PASSWORD: $DB_PASSWORD
