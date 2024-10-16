@@ -545,10 +545,19 @@ describe("getRandomPersonFullInfo - Positive Tests", () => {
 }
 );
 
-describe("getRandomPersonsBulk - Positive Tests", () => {
-  test('should return an array of random persons with full information', async () => {
+describe("getRandomPersonsBulk - Positive Boundary Tests", () => {
+  const validCounts = [2, 3, 50, 99, 100];
+
+  beforeEach(() => {
     db.initialize();
-    const count = 5;
+  });
+
+  afterEach(() => {
+    db.destroy();
+  });
+
+  // Positive tests for valid boundary values
+  test.each(validCounts)("should return an array of random persons with full information for count %i", async (count) => {
     const result = await getRandomPersonsBulk(count);
 
     // Ensure the result is an array of the correct length
@@ -559,19 +568,35 @@ describe("getRandomPersonsBulk - Positive Tests", () => {
 
     // Verify the main properties
     ['firstName', 'lastName', 'gender', 'birthDate', 'cpr', 'address', 'phoneNumber'].forEach(prop => {
-        expect(person).toHaveProperty(prop);
-        expect(person[prop]).not.toBeNull();
-        expect(person[prop]).not.toBeUndefined();
+      expect(person).toHaveProperty(prop);
+      expect(person[prop]).not.toBeNull();
+      expect(person[prop]).not.toBeUndefined();
     });
 
     // Verify the address properties
     const addressProps = ['street', 'number', 'floor', 'door', 'postal_code', 'town_name'];
     addressProps.forEach(prop => {
-        expect(person.address).toHaveProperty(prop);
-        expect(person.address[prop]).not.toBeNull();
-        expect(person.address[prop]).not.toBeUndefined();
+      expect(person.address).toHaveProperty(prop);
+      expect(person.address[prop]).not.toBeNull();
+      expect(person.address[prop]).not.toBeUndefined();
     });
+  });
+});
+
+describe("getRandomPersonsBulk - Negative Boundary Tests", () => {
+  const invalidCounts = [1, 101];
+
+  beforeEach(() => {
+    db.initialize();
+  });
+
+  afterEach(() => {
     db.destroy();
   });
-}
-);
+
+  // Negative tests for invalid boundary values
+  test.each(invalidCounts)("should throw an error for invalid count %i", async (count) => {
+    await expect(getRandomPersonsBulk(count)).rejects.toThrow("Invalid count, must be between 2 and 100");
+  });
+});
+
