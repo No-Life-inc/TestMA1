@@ -17,8 +17,9 @@ const getRandomNumber = () => {
   let number = Math.floor(Math.random() * 999) + 1; // number between 1 and 999
   if (Math.random() < 0.2) {
     number += String.fromCharCode(65 + Math.floor(Math.random() * 26)); // Add random letter (A-Z)
+    return number
   }
-  return number;
+  return number.toString();
 };
 
 // Helper function to generate a random floor
@@ -26,7 +27,8 @@ const getRandomFloor = () => {
   if (Math.random() < 0.3) {
     return "st"; // 30% chance for st (stuen)
   }
-  return Math.floor(Math.random() * 99) + 1; // Floor number between 1 and 99
+  floor = Math.floor(Math.random() * 99) + 1; // Floor number between 1 and 99
+  return floor.toString();
 };
 
 // Helper function to generate a random door
