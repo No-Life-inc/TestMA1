@@ -545,9 +545,8 @@ describe("getRandomPersonFullInfo - Positive Tests", () => {
 }
 );
 
-describe("getRandomPersonsBulk - Boundary Tests", () => {
+describe("getRandomPersonsBulk - Positive Boundary Tests", () => {
   const validCounts = [2, 3, 50, 99, 100];
-  const invalidCounts = [1, 101];
 
   beforeEach(() => {
     db.initialize();
@@ -582,9 +581,22 @@ describe("getRandomPersonsBulk - Boundary Tests", () => {
       expect(person.address[prop]).not.toBeUndefined();
     });
   });
+});
+
+describe("getRandomPersonsBulk - Negative Boundary Tests", () => {
+  const invalidCounts = [1, 101];
+
+  beforeEach(() => {
+    db.initialize();
+  });
+
+  afterEach(() => {
+    db.destroy();
+  });
 
   // Negative tests for invalid boundary values
   test.each(invalidCounts)("should throw an error for invalid count %i", async (count) => {
     await expect(getRandomPersonsBulk(count)).rejects.toThrow("Invalid count, must be between 2 and 100");
   });
 });
+
