@@ -27,7 +27,7 @@ const getRandomFloor = () => {
   if (Math.random() < 0.3) {
     return "st"; // 30% chance for st (stuen)
   }
-  floor = Math.floor(Math.random() * 99) + 1; // Floor number between 1 and 99
+  let floor = Math.floor(Math.random() * 99) + 1; // Floor number between 1 and 99
   return floor.toString();
 };
 
