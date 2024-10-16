@@ -41,7 +41,8 @@ const getRandomDoor = () => {
   } else if (doorType < 17) {
     return "mf";
   } else if (doorType < 19) {
-    return Math.floor(Math.random() * 50) + 1; // number between 1 and 50
+    let doorNumber = Math.floor(Math.random() * 50) + 1; // number between 1 and 50
+    return doorNumber.toString();
   } else {
     const lowerCaseLetters = "abcdefghijklmnopqrstuvwxyzøæå";
     let door =
