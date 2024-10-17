@@ -47,6 +47,13 @@ Lastly, use the following command:
 npx knex migrate:latest
 npx knex seed:run
 ```
+
+In the frontend to run cypress you need to execute the following command 
+
+```bash
+npx cypress open
+```
+
 ## API Endpoints
 
 | Method | Endpoint           | Description                                                    |
