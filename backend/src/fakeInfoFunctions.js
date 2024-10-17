@@ -237,8 +237,9 @@ const getRandomPersonFullInfo = async () => {
 };
 
 const getRandomPersonsBulk = async (count) => {
-  if (count < 2) count = 2;
-  if (count > 100) count = 100;
+  if (count < 2 || count > 100) {
+    throw new Error("Invalid count, must be between 2 and 100");
+  }
 
   const persons = [];
   for (let i = 0; i < count; i++) {
