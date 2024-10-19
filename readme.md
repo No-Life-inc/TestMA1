@@ -48,7 +48,29 @@ npx knex migrate:latest
 npx knex seed:run
 ```
 
+to run backend make sure the dependencies are installed by:
+```bash
+cd backend
+```
+
+```bash
+npm i
+```
+
+you can then use docker-compose in the root folder:
+
+```bash
+docker-compose up -d
+```
+
 In the frontend to run cypress you need to execute the following command 
+```bash
+cd frontend
+```
+
+```bash
+npm i
+```
 
 ```bash
 npx cypress open

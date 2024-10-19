@@ -584,7 +584,7 @@ describe("getRandomPersonsBulk - Positive Boundary Tests", () => {
 });
 
 describe("getRandomPersonsBulk - Negative Boundary Tests", () => {
-  const invalidCounts = [1, 101];
+  const invalidCounts = [ -101, -100, -99, -50, -3, -2, -1, 1, 101];
 
   beforeEach(() => {
     db.initialize();
