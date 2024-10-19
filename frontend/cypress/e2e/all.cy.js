@@ -15,6 +15,11 @@ describe('Fake Personal Data Generator', () => {
     cy.get('.firstNameValue').should('not.have.class', 'hidden');
     cy.get('.lastNameValue').should('not.have.class', 'hidden');
     cy.get('.genderValue').should('not.have.class', 'hidden');
+    cy.get('.dobValue').should('not.have.class', 'hidden');
+    cy.get('.cprValue').should('not.have.class', 'hidden');
+    cy.get('.streetValue').should('not.have.class', 'hidden');
+    cy.get('.townValue').should('not.have.class', 'hidden');
+    cy.get('.phoneNumberValue').should('not.have.class', 'hidden');
   });
 
   it('should generate only CPR', () => {
