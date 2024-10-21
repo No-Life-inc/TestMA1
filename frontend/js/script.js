@@ -10,7 +10,7 @@ document.querySelector('#frmGenerate').addEventListener('submit', (e) => {
         if (numPersons > 1) {
             endpoint += `bulk/${numPersons}`;
         } else {
-            endpoint += 'person';
+            endpoint += 'person-full';
         }
     }  else {
         // Map the selected value to the correct endpoint
