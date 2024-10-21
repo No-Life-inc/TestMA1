@@ -1,25 +1,16 @@
 {
-  "name": "testma1",
-  "version": "1.0.0",
-  "type": "module",
-  "description": "- Morten Bendeke\r - Betül Iskender\r - Yelong Hartl-He\r - Zack Ottesen",
-  "main": "app.js",
-  "directories": {
-    "test": "test"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "express": "^4.21.0",
-    "knex": "^3.1.0",
-    "mysql": "^2.18.1"
-  },
   "devDependencies": {
-    "@eslint/js": "^9.11.1",
-    "eslint": "^9.11.1",
-    "globals": "^15.9.0"
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.4",
+    "@babel/preset-react": "^7.24.7",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
   }
 }
