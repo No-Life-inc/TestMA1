@@ -89,7 +89,7 @@ describe("getPersonsData - Positive Tests", () => {
 
 describe("getPersonsData - Negative Tests", () => {
   afterEach(() => {
-    jest.restoreAllMocks(); // Gendanner alle mocks for at frigive ressourcer
+    jest.restoreAllMocks();//Restore all mocks to release resources
   });
   test.each([
     [
